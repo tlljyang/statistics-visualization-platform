@@ -2,6 +2,7 @@ import {
   div,
   h2,
   label,
+  p,
   select,
   option,
   input,
@@ -14,19 +15,26 @@ import type { SidebarState } from './types';
 
 export function view(state$: Stream<SidebarState>): Stream<VNode> {
   return state$.map((state) =>
-    div('.sidebar.p-4.border-end.bg-light.h-100', [
-      // Title
-      h2('.sidebar-title.h4.mb-4', 'Regression Teaching Tool'),
+    div('.control-panel', [
+      h2('.control-panel__title', 'Control Panel'),
+      p(
+        '.control-panel__intro',
+        'Choose a dataset, reveal the regression line, and clear your hand-drawn line when you want to try again.'
+      ),
 
-      // Dataset selection section
-      div('.sidebar-section.mb-4.mt-4', [
+      div('.control-panel__group', [
+        div('.control-panel__label-row', [
+          span('.control-panel__label', 'Dataset'),
+          span('.control-panel__value', String(state.datasets.length)),
+        ]),
+        p('.control-panel__hint', 'Switch the scatterplot students are reasoning from.'),
         label(
-          '.sidebar-label.form-label',
+          '.sr-only',
           { attrs: { for: 'dataset-select' } },
-          'Select Dataset:'
+          'Select Dataset'
         ),
         select(
-          '#dataset-select.dataset-select.form-select',
+          '#dataset-select.dataset-select.control-panel__select',
           { attrs: { disabled: state.datasets.length === 0 } },
           [
             state.datasets.length === 0
@@ -50,55 +58,49 @@ export function view(state$: Stream<SidebarState>): Stream<VNode> {
         ),
       ]),
 
-      // Regression toggle section
-      div('.sidebar-section.mb-4.mt-4', [
-        div('.form-check.form-switch', [
-          input('#regression-toggle.regression-toggle.form-check-input', {
+      div('.control-panel__group', [
+        label('.toggle-row', { attrs: { for: 'regression-toggle' } }, [
+          span('.toggle-row__copy', [
+            span('.control-panel__label', 'Regression line'),
+            span('.control-panel__hint', 'Compare the model fit with a custom line.'),
+          ]),
+          input('#regression-toggle.regression-toggle.toggle-row__input', {
             attrs: {
               type: 'checkbox',
               checked: state.showRegression,
             },
           }),
-          label(
-            '.form-check-label',
-            { attrs: { for: 'regression-toggle' } },
-            'Show Regression Line'
-          ),
         ]),
       ]),
 
-      // Clear custom line button section
-      div('.sidebar-section.mb-4.mt-4', [
+      div('.control-panel__actions', [
         button(
-          '.clear-custom-line.btn.btn-outline-secondary',
+          '.clear-custom-line.control-panel__button',
           { attrs: { type: 'button' } },
           'Clear Custom Line'
         ),
       ]),
 
-      // Info section (optional)
       state.datasets.length > 0
-        ? div('.sidebar-info.card.mt-3', [
-            div('.card-body', [
-              div('.info-item.mb-2', [
-                span('.info-label.fw-bold', 'Selected: '),
+        ? div('.control-panel__summary-card', [
+              div('.info-item', [
+                span('.metric-label', 'Selected dataset'),
                 span(
-                  '.info-value',
+                  '.metric-value',
                   state.datasets.find((d) => d.id === state.selectedDataset)
                     ?.name || 'None'
                 ),
               ]),
               div('.info-item', [
-                span('.info-label.fw-bold', 'Data Points: '),
+                span('.metric-label', 'Data points'),
                 span(
-                  '.info-value',
+                  '.metric-value',
                   String(
                     state.datasets.find((d) => d.id === state.selectedDataset)
                       ?.data.length || 0
                   )
                 ),
               ]),
-            ]),
           ])
         : null,
     ])

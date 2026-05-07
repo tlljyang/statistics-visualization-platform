@@ -30,16 +30,14 @@ export function view(state$: Stream<State>): Stream<VNode> {
     // Line type badge class
     const lineTypeBadge =
       sse.lineType === 'regression'
-        ? 'bg-success'
+        ? 'line-badge--regression'
         : sse.lineType === 'custom'
-        ? 'bg-danger'
-        : 'bg-secondary';
+        ? 'line-badge--custom'
+        : 'line-badge--none';
 
-    return div('.statistics-panel.card.shadow-sm', [
-      // Title
+    return div('.statistics-panel', [
       h4('.statistics-title', 'Statistics'),
 
-      // SSE Section
       div('.sse-section', [
         div('.stat-row', [
           span('.stat-label', 'Sum of Squared Errors (SSE)'),
@@ -47,14 +45,13 @@ export function view(state$: Stream<State>): Stream<VNode> {
         ]),
         div('.stat-row', [
           span('.stat-label', 'Line Type'),
-          span(`.badge.${lineTypeBadge}`, lineTypeDisplay),
+          span(`.line-badge.${lineTypeBadge}`, lineTypeDisplay),
         ]),
       ]),
 
-      // Residual Section (always shown, horizontal layout)
       div('.residual-section', [
-        div('.d-flex.flex-row.align-items-center.flex-wrap', [
-          span('.stat-label.me-2', 'Hover:'),
+        div('.residual-row', [
+          span('.stat-label', 'Hover'),
           hover.point !== null &&
           hover.residual !== null &&
           hover.lineY !== null &&
@@ -62,17 +59,17 @@ export function view(state$: Stream<State>): Stream<VNode> {
           hover.point.y !== undefined
             ? div([
                 span(
-                  '.stat-value.me-2',
+                  '.stat-value',
                   `(${hover.point.x.toFixed(2)}, ${hover.point.y.toFixed(2)})`
                 ),
-                small('.text-muted.mx-2', '|'),
-                span('.stat-label.me-1', 'Res:'),
-                span('.stat-value.me-2', hover.residual.toFixed(4)),
-                small('.text-muted.mx-2', '|'),
-                span('.stat-label.me-1', 'Y hat:'),
+                small('.stat-divider', '|'),
+                span('.stat-label', 'Res'),
+                span('.stat-value', hover.residual.toFixed(4)),
+                small('.stat-divider', '|'),
+                span('.stat-label', 'Y hat'),
                 span('.stat-value', hover.lineY.toFixed(4)),
               ])
-            : span('.stat-value.text-muted', 'Hover over a point'),
+            : span('.stat-value.stat-value--muted', 'Hover over a point'),
         ]),
       ]),
     ]);

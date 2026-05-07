@@ -26,8 +26,7 @@ export function view(state$: Stream<State>): Stream<VNode> {
     } = state;
     const chartHeight = height - margins.top - margins.bottom;
 
-    return h('div.regression-chart.card.shadow-sm', [
-      // SVG chart
+    return h('div.regression-chart', [
       svg(
         {
           attrs: {

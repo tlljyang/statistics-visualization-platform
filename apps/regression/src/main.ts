@@ -4,9 +4,6 @@ import { makeHTTPDriver } from '@cycle/http';
 import xs, { Stream } from 'xstream';
 import { h } from '@cycle/dom';
 
-// Import Bootstrap CSS from local installation
-import 'bootstrap/dist/css/bootstrap.min.css';
-// Import custom styles
 import './styles/custom.css';
 import { Hero } from './components/Hero';
 import { Sidebar } from './components/Sidebar';
@@ -143,23 +140,46 @@ function main(sources: MainSources): MainSinks {
       statisticsPanelSinks.DOM
     )
     .map(([hero, sidebar, chart, panel]) =>
-      h('div.app-container.container-fluid.py-4', {}, [
-        h('div.mb-4', [hero]),
-        h('div.row.g-4', {}, [
-          h(
-            'div.sidebar.col-12.col-lg-3',
-            { style: { minWidth: '250px' } },
-            [sidebar]
-          ),
-          h('div.chart-area.col-12.col-lg-9.p-3.d-flex.flex-column', {}, [
+      h('div.page-container', {}, [
+        hero,
+        h('section.lesson-banner', {}, [
+          h('div', {}, [
+            h('div.lesson-label', 'Current exercise'),
+            h('h2.lesson-title', 'Draw, compare, and reason from residuals'),
             h(
-              'div.chart-wrapper.flex-grow-1.d-flex.align-items-center.justify-content-center.bg-white.border.rounded-4.shadow-sm.p-3',
-              { style: { minHeight: '0' } },
-              [chart]
+              'p.lesson-headline',
+              'Use the same dataset to compare your line against the least-squares fit.'
             ),
-            h('div.panel-wrapper.mt-3', { style: { flexShrink: '0' } }, [
-              panel,
+            h(
+              'p.lesson-prompt',
+              'Students can test a visual prediction, then use SSE and residuals to explain why one line fits better.'
+            ),
+          ]),
+          h('div.lesson-stats', {}, [
+            h('div.lesson-stat', {}, [
+              h('span.lesson-stat-label', 'Teaching focus'),
+              h('span.lesson-stat-value', 'Slope and fit'),
             ]),
+            h('div.lesson-stat', {}, [
+              h('span.lesson-stat-label', 'Feedback'),
+              h('span.lesson-stat-value', 'SSE + residuals'),
+            ]),
+          ]),
+        ]),
+        h('section.content-grid', {}, [
+          h('aside.control-sidebar', {}, [sidebar]),
+          h('div.chart-column', {}, [
+            h('section.chart-card', {}, [
+              h('div.chart-card-header', {}, [
+                h('h2.chart-card-title', 'Scatterplot and fitted lines'),
+                h(
+                  'p.chart-card-subtitle',
+                  'Click and drag on the graph to draw a custom line, then compare it with the regression line.'
+                ),
+              ]),
+              h('div.chart-shell', {}, [chart]),
+            ]),
+            panel,
           ]),
         ]),
       ])
