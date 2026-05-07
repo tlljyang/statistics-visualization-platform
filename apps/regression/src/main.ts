@@ -32,6 +32,8 @@ function main(sources: MainSources): MainSinks {
     '[main] main() called - Sidebar + RegressionChart + StatisticsPanel composition'
   );
 
+  const dataBaseUrl = import.meta.env.BASE_URL;
+
   const heroProps$ = xs.of({
     eyebrow: 'Interactive Regression Teaching Site',
     title: 'Teach regression by letting students test ideas visually.',
@@ -174,4 +176,3 @@ run(main, {
   DOM: makeDOMDriver('#main-container'),
   HTTP: makeHTTPDriver(),
 });
-  const dataBaseUrl = import.meta.env.BASE_URL;
