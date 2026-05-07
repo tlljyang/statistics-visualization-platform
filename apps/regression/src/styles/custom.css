@@ -149,6 +149,11 @@ select {
   font-weight: 700;
 }
 
+.metric-value--compact {
+  font-size: 0.9rem;
+  line-height: 1.35;
+}
+
 .content-grid {
   display: grid;
   grid-template-columns: 320px minmax(0, 1fr);

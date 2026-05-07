@@ -6,6 +6,9 @@ import type { VNode } from '@cycle/dom';
 export interface Dataset {
   id: string;
   name: string;
+  source?: string;
+  xLabel?: string;
+  yLabel?: string;
   data: Array<{ x: number; y: number }>;
 }
 

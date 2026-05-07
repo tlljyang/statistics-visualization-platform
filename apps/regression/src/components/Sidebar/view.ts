@@ -101,6 +101,36 @@ export function view(state$: Stream<SidebarState>): Stream<VNode> {
                   )
                 ),
               ]),
+              state.datasets.find((d) => d.id === state.selectedDataset)?.source
+                ? div('.info-item', [
+                    span('.metric-label', 'Source'),
+                    span(
+                      '.metric-value.metric-value--compact',
+                      state.datasets.find((d) => d.id === state.selectedDataset)
+                        ?.source || ''
+                    ),
+                  ])
+                : null,
+              state.datasets.find((d) => d.id === state.selectedDataset)?.xLabel
+                ? div('.info-item', [
+                    span('.metric-label', 'X variable'),
+                    span(
+                      '.metric-value.metric-value--compact',
+                      state.datasets.find((d) => d.id === state.selectedDataset)
+                        ?.xLabel || ''
+                    ),
+                  ])
+                : null,
+              state.datasets.find((d) => d.id === state.selectedDataset)?.yLabel
+                ? div('.info-item', [
+                    span('.metric-label', 'Y variable'),
+                    span(
+                      '.metric-value.metric-value--compact',
+                      state.datasets.find((d) => d.id === state.selectedDataset)
+                        ?.yLabel || ''
+                    ),
+                  ])
+                : null,
           ])
         : null,
     ])
