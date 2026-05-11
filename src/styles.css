@@ -65,6 +65,27 @@ button {
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-end;
+  gap: 14px;
+}
+
+.visualizer-nav__group {
+  display: grid;
+  gap: 6px;
+}
+
+.visualizer-nav__group-title {
+  margin: 0;
+  color: #6b7280;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.visualizer-nav__button-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
   gap: 8px;
 }
 
@@ -108,6 +129,11 @@ button {
   }
 
   .visualizer-nav {
+    justify-content: stretch;
+  }
+
+  .visualizer-nav__group,
+  .visualizer-nav__button-row {
     justify-content: stretch;
   }
 

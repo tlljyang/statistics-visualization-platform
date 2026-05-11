@@ -8,11 +8,37 @@ import {
 } from "../src/visualizers";
 
 describe("visualizer registry", () => {
-  it("registers the three teaching visualizers in navigation order", () => {
+  it("registers all teaching visualizers in grouped navigation order", () => {
     expect(visualizers.map((visualizer) => visualizer.id)).toEqual([
       "confidence-interval",
       "type-error",
-      "regression"
+      "regression",
+      "simulation-introduction",
+      "simulation-random-variable",
+      "simulation-variance-reduction",
+      "simulation-resampling",
+      "simulation-mcmc",
+      "mes-anova",
+      "mes-confidence-interval",
+      "mes-distributions",
+      "mes-linear-regression"
+    ]);
+  });
+
+  it("groups the existing and WALS visualizers separately", () => {
+    expect(visualizers.map((visualizer) => visualizer.group)).toEqual([
+      "Core Visualizers",
+      "Core Visualizers",
+      "Core Visualizers",
+      "WALS Simulation",
+      "WALS Simulation",
+      "WALS Simulation",
+      "WALS Simulation",
+      "WALS Simulation",
+      "WALS MES",
+      "WALS MES",
+      "WALS MES",
+      "WALS MES"
     ]);
   });
 

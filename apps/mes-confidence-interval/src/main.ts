@@ -1,0 +1,8 @@
+import { makeDOMDriver } from "@cycle/dom";
+import { run } from "@cycle/run";
+import { MesConfidenceIntervalApp } from "./components/MesConfidenceIntervalApp";
+import "./styles/custom.css";
+
+run(MesConfidenceIntervalApp, {
+  DOM: makeDOMDriver("#app")
+});

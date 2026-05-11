@@ -23,6 +23,51 @@ const apps = [
     name: "regression",
     cwd: resolve(projectDir, "apps/regression"),
     baseSegment: "apps/regression/"
+  },
+  {
+    name: "simulation-introduction",
+    cwd: resolve(projectDir, "apps/simulation-introduction"),
+    baseSegment: "apps/simulation-introduction/"
+  },
+  {
+    name: "simulation-random-variable",
+    cwd: resolve(projectDir, "apps/simulation-random-variable"),
+    baseSegment: "apps/simulation-random-variable/"
+  },
+  {
+    name: "simulation-variance-reduction",
+    cwd: resolve(projectDir, "apps/simulation-variance-reduction"),
+    baseSegment: "apps/simulation-variance-reduction/"
+  },
+  {
+    name: "simulation-resampling",
+    cwd: resolve(projectDir, "apps/simulation-resampling"),
+    baseSegment: "apps/simulation-resampling/"
+  },
+  {
+    name: "simulation-mcmc",
+    cwd: resolve(projectDir, "apps/simulation-mcmc"),
+    baseSegment: "apps/simulation-mcmc/"
+  },
+  {
+    name: "mes-anova",
+    cwd: resolve(projectDir, "apps/mes-anova"),
+    baseSegment: "apps/mes-anova/"
+  },
+  {
+    name: "mes-confidence-interval",
+    cwd: resolve(projectDir, "apps/mes-confidence-interval"),
+    baseSegment: "apps/mes-confidence-interval/"
+  },
+  {
+    name: "mes-distributions",
+    cwd: resolve(projectDir, "apps/mes-distributions"),
+    baseSegment: "apps/mes-distributions/"
+  },
+  {
+    name: "mes-linear-regression",
+    cwd: resolve(projectDir, "apps/mes-linear-regression"),
+    baseSegment: "apps/mes-linear-regression/"
   }
 ];
 

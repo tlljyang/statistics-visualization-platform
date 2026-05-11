@@ -37,6 +37,29 @@ function createNavButton(visualizer: VisualizerLink, isActive: boolean): HTMLBut
   return button;
 }
 
+function createNavGroup(
+  groupName: VisualizerLink["group"],
+  activeVisualizer: VisualizerLink
+): HTMLElement {
+  const group = document.createElement("section");
+  group.className = "visualizer-nav__group";
+
+  const heading = document.createElement("h2");
+  heading.className = "visualizer-nav__group-title";
+  heading.textContent = groupName;
+
+  const buttons = document.createElement("div");
+  buttons.className = "visualizer-nav__button-row";
+
+  for (const visualizer of visualizers.filter((item) => item.group === groupName)) {
+    buttons.append(createNavButton(visualizer, visualizer.id === activeVisualizer.id));
+  }
+
+  group.append(heading, buttons);
+
+  return group;
+}
+
 function render(): void {
   const activeVisualizer = getVisualizerById(getHashId());
   document.title = `${activeVisualizer.pageTitle} | 统计学习可视化平台`;
@@ -66,8 +89,8 @@ function render(): void {
   nav.className = "visualizer-nav";
   nav.setAttribute("aria-label", "选择可视化模块");
 
-  for (const visualizer of visualizers) {
-    nav.append(createNavButton(visualizer, visualizer.id === activeVisualizer.id));
+  for (const group of ["Core Visualizers", "WALS Simulation", "WALS MES"] as const) {
+    nav.append(createNavGroup(group, activeVisualizer));
   }
 
   header.append(titleGroup, nav);
