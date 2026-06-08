@@ -7,7 +7,7 @@ import type { Actions, Sample, Scales, Config, State } from "./types";
 function createInitialState(): State {
   const config: Config = {
     width: 760,
-    height: 460,
+    height: 360,
     margin: { top: 24, right: 32, bottom: 56, left: 56 },
     populationMean: 10,
   };

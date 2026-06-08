@@ -14,14 +14,15 @@ export function drawXAxis(container: any, scale: ScaleLinear<number, number>): v
       existingAxis
         .transition()
         .duration(500)
-        .call(d3.axisBottom(scale))
+        .call(d3.axisBottom(scale).ticks(6).tickSizeOuter(0))
         .attr("data-scale-range", scale.range().toString())
         .attr("data-scale-domain", scale.domain().toString());
+      styleAxis(existingAxis);
       return;
     }
   }
 
-  const axis = d3.axisBottom(scale);
+  const axis = d3.axisBottom(scale).ticks(6).tickSizeOuter(0);
   container
     .append("g")
     .call(axis)
@@ -30,6 +31,7 @@ export function drawXAxis(container: any, scale: ScaleLinear<number, number>): v
     .attr("data-scale-domain", scale.domain().toString())
     .style("user-select", "none")
     .style("pointer-events", "none");
+  styleAxis(container.select("#x-axis"));
 }
 
 // Y-axis rendering
@@ -45,14 +47,15 @@ export function drawYAxis(container: any, scale: ScaleLinear<number, number>): v
       existingAxis
         .transition()
         .duration(500)
-        .call(d3.axisLeft(scale))
+        .call(d3.axisLeft(scale).ticks(6).tickSizeOuter(0))
         .attr("data-scale-range", scale.range().toString())
         .attr("data-scale-domain", scale.domain().toString());
+      styleAxis(existingAxis);
       return;
     }
   }
 
-  const axis = d3.axisLeft(scale);
+  const axis = d3.axisLeft(scale).ticks(6).tickSizeOuter(0);
   container
     .append("g")
     .call(axis)
@@ -61,4 +64,11 @@ export function drawYAxis(container: any, scale: ScaleLinear<number, number>): v
     .attr("data-scale-domain", scale.domain().toString())
     .style("user-select", "none")
     .style("pointer-events", "none");
+  styleAxis(container.select("#y-axis"));
+}
+
+function styleAxis(axis: any): void {
+  axis.select(".domain").attr("stroke", "var(--axis)").attr("stroke-width", 1);
+  axis.selectAll(".tick line").attr("stroke", "var(--grid)").attr("stroke-width", 1);
+  axis.selectAll(".tick text").attr("fill", "var(--text-secondary)").attr("font-size", 12);
 }

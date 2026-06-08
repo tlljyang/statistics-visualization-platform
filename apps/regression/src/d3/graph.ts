@@ -45,19 +45,24 @@ function regressionChart(
       (enter) =>
         enter
           .append('circle')
-          .attr('class', 'data-point')
+          .attr('class', (d: Point) => d.outlier ? 'data-point data-point--outlier' : 'data-point')
           .attr('cx', (d: Point) => scales.xScale(d.x))
           .attr('cy', (d: Point) => scales.yScale(d.y))
           .attr('r', 5)
-          .attr('fill', 'steelblue')
+          .attr('fill', (d: Point) => d.outlier ? 'var(--danger)' : 'var(--teal)')
+          .attr('opacity', (d: Point) => d.outlier ? 0.86 : 0.82)
+          .attr('stroke', '#fffdf8')
+          .attr('stroke-width', 2)
           .attr('data-x', (d: Point) => d.x)
           .attr('data-y', (d: Point) => d.y),
       (update) =>
         update
           .attr('cx', (d: Point) => scales.xScale(d.x))
           .attr('cy', (d: Point) => scales.yScale(d.y))
+          .attr('class', (d: Point) => d.outlier ? 'data-point data-point--outlier' : 'data-point')
           .attr('data-x', (d: Point) => d.x)
-          .attr('data-y', (d: Point) => d.y),
+          .attr('data-y', (d: Point) => d.y)
+          .attr('fill', (d: Point) => d.outlier ? 'var(--danger)' : 'var(--teal)'),
       (exit) => exit.remove()
     );
 
@@ -101,8 +106,8 @@ function drawRegressionLine(
     .datum(data)
     .attr('d', line)
     .attr('class', 'regression-line')
-    .attr('stroke', 'blue')
-    .attr('stroke-width', 2)
+    .attr('stroke', 'var(--chart-blue)')
+    .attr('stroke-width', 2.4)
     .attr('fill', 'none');
 }
 
@@ -119,7 +124,7 @@ export function createVerticalLineVNode(
       y1: scales.yScale(hoverPoint.y),
       x2: scales.xScale(hoverPoint.x),
       y2: scales.yScale(regressionY),
-      stroke: 'red',
+      stroke: 'var(--danger)',
       'stroke-width': 1,
       'stroke-dasharray': '3,3',
       opacity: 0.7,
@@ -136,7 +141,7 @@ export function createHoveredPointVNode(point: Point, scales: Scales): VNode {
       cy: scales.yScale(point.y),
       r: 8,
       fill: 'none',
-      stroke: 'red',
+      stroke: 'var(--danger)',
       'stroke-width': 2,
     },
   });
@@ -159,7 +164,7 @@ export function createTempLineVNode(
       y1: scales.yScale(tempPoints.start.y),
       x2: scales.xScale(tempPoints.end.x),
       y2: scales.yScale(tempPoints.end.y),
-      stroke: 'grey',
+      stroke: 'var(--text-secondary)',
       'stroke-width': 2,
       'stroke-dasharray': '5,5',
     },
@@ -197,7 +202,7 @@ export function createCustomLineVNode(
       y1: scales.yScale(yMin),
       x2: scales.xScale(xMax),
       y2: scales.yScale(yMax),
-      stroke: 'red',
+      stroke: 'var(--danger)',
       'stroke-width': 2,
     },
   });

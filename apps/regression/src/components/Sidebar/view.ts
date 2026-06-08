@@ -73,6 +73,21 @@ export function view(state$: Stream<SidebarState>): Stream<VNode> {
         ]),
       ]),
 
+      div('.control-panel__group', [
+        label('.toggle-row', { attrs: { for: 'outlier-toggle' } }, [
+          span('.toggle-row__copy', [
+            span('.control-panel__label', 'Show outliers'),
+            span('.control-panel__hint', 'Hide or reveal influential observations to compare their effect.'),
+          ]),
+          input('#outlier-toggle.outlier-toggle.toggle-row__input', {
+            attrs: {
+              type: 'checkbox',
+              checked: state.showOutliers,
+            },
+          }),
+        ]),
+      ]),
+
       div('.control-panel__actions', [
         button(
           '.clear-custom-line.control-panel__button',
@@ -96,9 +111,22 @@ export function view(state$: Stream<SidebarState>): Stream<VNode> {
                 span(
                   '.metric-value',
                   String(
-                    state.datasets.find((d) => d.id === state.selectedDataset)
-                      ?.data.length || 0
+                    (state.datasets.find((d) => d.id === state.selectedDataset)
+                      ?.data.length || 0) -
+                      (state.showOutliers
+                        ? 0
+                        : state.datasets.find((d) => d.id === state.selectedDataset)
+                            ?.data.filter((point) => point.outlier).length || 0)
                   )
+                ),
+              ]),
+              div('.info-item', [
+                span('.metric-label', 'Outliers'),
+                span(
+                  '.metric-value.metric-value--compact',
+                  state.showOutliers
+                    ? 'Shown'
+                    : 'Hidden'
                 ),
               ]),
               state.datasets.find((d) => d.id === state.selectedDataset)?.source

@@ -58,5 +58,5 @@ export interface Sinks {
 }
 
 export interface Actions {
-  // No top-level actions currently
+  testType$: Stream<'right-tailed' | 'two-tailed'>;
 }

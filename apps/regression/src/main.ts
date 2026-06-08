@@ -5,7 +5,7 @@ import xs, { Stream } from 'xstream';
 import { h } from '@cycle/dom';
 
 import './styles/custom.css';
-import { Hero } from './components/Hero';
+import { getRegressionDataBaseUrl } from './dataBaseUrl';
 import { Sidebar } from './components/Sidebar';
 import { RegressionChart } from './components/RegressionChart';
 import { StatisticsPanel } from './components/StatisticsPanel';
@@ -29,27 +29,16 @@ function main(sources: MainSources): MainSinks {
     '[main] main() called - Sidebar + RegressionChart + StatisticsPanel composition'
   );
 
-  const dataBaseUrl = import.meta.env.BASE_URL;
-
-  const heroProps$ = xs.of({
-    eyebrow: 'Interactive Regression Teaching Site',
-    title: 'Teach regression by letting students test ideas visually.',
-    description:
-      'Start with a dataset, ask students to predict the slope, then compare a hand-drawn line with the least-squares fit.',
-    highlights: [
-      'Predict the sign of the slope',
-      'Compare SSE values',
-      'Use residuals to explain fit',
-    ],
-  });
-
-  const heroSinks = Hero({
-    props: heroProps$,
-  });
+  const dataBaseUrl = getRegressionDataBaseUrl(
+    window.location.pathname,
+    import.meta.env.BASE_URL,
+    import.meta.env.DEV
+  );
 
   // ==================== Sidebar Component ====================
   const sidebarProps$ = xs.of({
     datasetPaths: [
+      `${dataBaseUrl}data/outlier-impact.json`,
       `${dataBaseUrl}data/positive-correlation.json`,
       `${dataBaseUrl}data/negative-correlation.json`,
       `${dataBaseUrl}data/no-correlation.json`,
@@ -89,10 +78,10 @@ function main(sources: MainSources): MainSinks {
 
   // Combine Sidebar sinks to create RegressionChart props
   const chartProps$ = xs
-    .combine(sidebarSinks.selectedDataset, sidebarSinks.toggleRegression)
-    .map(([dataset, showRegression]): RegressionChartProps => {
+    .combine(sidebarSinks.selectedDataset, sidebarSinks.toggleRegression, sidebarSinks.toggleOutliers)
+    .map(([dataset, showRegression, showOutliers]): RegressionChartProps => {
       // Calculate xDomain and yDomain from dataset
-      const data = dataset.data;
+      const data = showOutliers ? dataset.data : dataset.data.filter((point) => !point.outlier);
       let xMin = 0,
         xMax = 0,
         yMin = 0,
@@ -116,9 +105,10 @@ function main(sources: MainSources): MainSinks {
       }
 
       return {
-        width: 800,
-        height: 600,
-        datasets: dataset.data,
+        width: 860,
+        height: 520,
+        margins: { top: 34, right: 34, bottom: 58, left: 64 },
+        datasets: data,
         xDomain: [xMin, xMax],
         yDomain: [yMin, yMax],
         showRegression: showRegression,
@@ -133,9 +123,9 @@ function main(sources: MainSources): MainSinks {
 
   // ==================== StatisticsPanel Component ====================
   // Create props stream for StatisticsPanel from the dataset data
-  const statsPanelProps$ = sidebarSinks.selectedDataset.map(
-    (dataset): StatisticsPanelProps => ({
-      datasets: dataset.data,
+  const statsPanelProps$ = xs.combine(sidebarSinks.selectedDataset, sidebarSinks.toggleOutliers).map(
+    ([dataset, showOutliers]): StatisticsPanelProps => ({
+      datasets: showOutliers ? dataset.data : dataset.data.filter((point) => !point.outlier),
     })
   );
 
@@ -150,52 +140,75 @@ function main(sources: MainSources): MainSinks {
   // ==================== Render ====================
   const vdom$ = xs
     .combine(
-      heroSinks.DOM,
       sidebarSinks.DOM,
       chartSinks.DOM,
       statisticsPanelSinks.DOM
     )
-    .map(([hero, sidebar, chart, panel]) =>
-      h('div.page-container', {}, [
-        hero,
-        h('section.lesson-banner', {}, [
-          h('div', {}, [
-            h('div.lesson-label', 'Current exercise'),
-            h('h2.lesson-title', 'Draw, compare, and reason from residuals'),
-            h(
-              'p.lesson-headline',
-              'Use the same dataset to compare your line against the least-squares fit.'
-            ),
-            h(
-              'p.lesson-prompt',
-              'Students can test a visual prediction, then use SSE and residuals to explain why one line fits better.'
-            ),
-          ]),
-          h('div.lesson-stats', {}, [
-            h('div.lesson-stat', {}, [
-              h('span.lesson-stat-label', 'Teaching focus'),
-              h('span.lesson-stat-value', 'Slope and fit'),
-            ]),
-            h('div.lesson-stat', {}, [
-              h('span.lesson-stat-label', 'Feedback'),
-              h('span.lesson-stat-value', 'SSE + residuals'),
-            ]),
-          ]),
-        ]),
-        h('section.content-grid', {}, [
-          h('aside.control-sidebar', {}, [sidebar]),
-          h('div.chart-column', {}, [
-            h('section.chart-card', {}, [
-              h('div.chart-card-header', {}, [
-                h('h2.chart-card-title', 'Scatterplot and fitted lines'),
+    .map(([sidebar, chart, panel]) =>
+      h('div.module-shell', {}, [
+        h('main.module-layout', {}, [
+          h('section.experiment-board', {}, [
+            h('header.experiment-header', {}, [
+              h('div', {}, [
+                h('p.eyebrow', 'Core Visualizer'),
+                h('h1', 'Regression'),
                 h(
-                  'p.chart-card-subtitle',
+                  'p',
+                  'Choose a dataset, draw a custom line, and compare it with the least-squares regression fit.'
+                ),
+              ]),
+            ]),
+            h('section.output-dock', {}, [
+              h('div.output-heading', {}, [
+                h('p.eyebrow', 'Model output'),
+                h('h2', 'Scatterplot and fitted lines'),
+                h(
+                  'p',
                   'Click and drag on the graph to draw a custom line, then compare it with the regression line.'
                 ),
               ]),
-              h('div.chart-shell', {}, [chart]),
+              h('div.chart-frame', {}, [h('div.chart-shell', {}, [chart])]),
             ]),
-            panel,
+            h('section.metrics-grid', {}, [panel]),
+          ]),
+          h('aside.teaching-area', {}, [
+            h('section.teaching-panel.parameter-panel', {}, [
+              h('p.eyebrow', 'Parameters'),
+              sidebar,
+            ]),
+            h('section.teaching-panel', {}, [
+              h('p.eyebrow', 'Concept + key idea'),
+              h('h2', 'Least-squares regression'),
+              h(
+                'p',
+                'Regression uses a line to describe the relationship between an explanatory variable and a response variable.'
+              ),
+              h('h3', 'Residuals explain fit'),
+              h(
+                'p',
+                'The least-squares line is the line that minimizes the sum of squared residuals across the dataset.'
+              ),
+            ]),
+            h('section.teaching-panel', {}, [
+              h('p.eyebrow', 'Formula'),
+              h('div.latex-formula', {}, [
+                h('div.math-expression', {}, [
+                  h('span', 'SSE ='),
+                  h('span.math-symbol', 'Σ'),
+                  h('span', ['(', 'y', h('sub', 'i'), ' − ', 'ŷ', h('sub', 'i'), ')']),
+                  h('sup', '2'),
+                ]),
+              ]),
+              h('p', 'Compare the custom line and regression line by watching how SSE changes.'),
+            ]),
+            h('section.teaching-panel', {}, [
+              h('p.eyebrow', 'Teaching notes'),
+              h('h3', 'Classroom focus'),
+              h(
+                'p',
+                'Ask students to predict the slope first, draw their line, and then use residuals to explain why one line fits better.'
+              ),
+            ]),
           ]),
         ]),
       ])

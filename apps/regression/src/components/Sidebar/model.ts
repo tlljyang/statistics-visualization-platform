@@ -15,7 +15,8 @@ export function model(actions: SidebarActions): Stream<SidebarState> {
       if (state.datasets.length === 0) {
         return {
           ...state,
-          showRegression: false,
+          showRegression: true,
+          showOutliers: true,
         };
       }
       // Otherwise keep state as-is (don't reset showRegression)
@@ -49,6 +50,13 @@ export function model(actions: SidebarActions): Stream<SidebarState> {
     })
   );
 
+  const outlierPatch$ = actions.toggleOutliers$.map(
+    () => (state: SidebarState) => ({
+      ...state,
+      showOutliers: !state.showOutliers,
+    })
+  );
+
   // Clear custom line action (state unchanged, just emits signal)
   const clearSignal$ = actions.clearCustomLine$.map(
     () => (state: SidebarState) => state
@@ -60,6 +68,7 @@ export function model(actions: SidebarActions): Stream<SidebarState> {
     datasetsLoadedPatch$,
     datasetPatch$,
     regressionPatch$,
+    outlierPatch$,
     clearSignal$
   );
 
@@ -67,7 +76,8 @@ export function model(actions: SidebarActions): Stream<SidebarState> {
   const initialState: SidebarState = {
     datasets: [],
     selectedDataset: '',
-    showRegression: false,
+    showRegression: true,
+    showOutliers: true,
   };
 
   // Apply all updates using fold
@@ -118,7 +128,18 @@ export function createToggleRegressionSink(
     .map(() => state$)
     .flatten()
     .map((state) => state.showRegression)
-    .startWith(false); // Initial value (matches SidebarState.showRegression default)
+    .startWith(true);
+}
+
+export function createToggleOutliersSink(
+  toggleOutliers$: Stream<null>,
+  state$: Stream<SidebarState>
+): Stream<boolean> {
+  return toggleOutliers$
+    .map(() => state$)
+    .flatten()
+    .map((state) => state.showOutliers)
+    .startWith(true);
 }
 
 export function createClearCustomLineSink(

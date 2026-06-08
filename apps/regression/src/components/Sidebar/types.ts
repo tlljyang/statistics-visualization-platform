@@ -9,7 +9,7 @@ export interface Dataset {
   source?: string;
   xLabel?: string;
   yLabel?: string;
-  data: Array<{ x: number; y: number }>;
+  data: Array<{ x: number; y: number; outlier?: boolean }>;
 }
 
 export interface SidebarProps {
@@ -28,6 +28,7 @@ export interface SidebarSinks {
   datasetChange: Stream<string>;
   selectedDataset: Stream<Dataset>;
   toggleRegression: Stream<boolean>;
+  toggleOutliers: Stream<boolean>;
   clearCustomLine: Stream<number>;
 }
 
@@ -36,6 +37,7 @@ export interface SidebarActions {
   datasetsLoaded$: Stream<Dataset[]>; // HTTP response: loaded datasets
   selectDataset$: Stream<string>;
   toggleRegression$: Stream<null>;
+  toggleOutliers$: Stream<null>;
   clearCustomLine$: Stream<null>;
 }
 
@@ -43,6 +45,7 @@ export interface SidebarState {
   datasets: Dataset[];
   selectedDataset: string;
   showRegression: boolean;
+  showOutliers: boolean;
 }
 
 export interface DatasetLoadError {

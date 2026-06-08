@@ -1,6 +1,6 @@
 import xs, { Stream } from 'xstream';
 import type { VNode } from '@cycle/dom';
-import { div, h1, h2, h3, p, span, small } from '@cycle/dom';
+import { div, h, h1, h2, h3, p, span, small } from '@cycle/dom';
 import type { AppState } from './types';
 
 function formatNumber(value: number): string {
@@ -53,120 +53,100 @@ export function view(
   return xs
     .combine(controlPanelDOM, chartDOM, state$)
     .map(([panel, chart, state]) =>
-      div('.type-errors-app-shell', [
-        div('.page-container', [
-          div('.hero-panel', [
-            div('.hero-copy', [
-              p('.eyebrow', 'Interactive Hypothesis Testing Lab'),
-              h1('.hero-title', 'See Type I and Type II errors as living shapes, not just definitions.'),
-              p(
-                '.hero-text',
-                'Adjust alpha, move the true mean, and watch the rejection region, beta, and power update together in one teaching view.'
-              ),
+      div('.module-shell', [
+        div('.module-layout', [
+          div('.experiment-board', [
+            div('.experiment-header', [
+              div([
+                p('.eyebrow', 'Core Visualizer'),
+                h1('Type I / II Error'),
+                p('Adjust alpha, move the true mean, and watch rejection regions, beta, and power update together.'),
+              ]),
             ]),
-            div('.hero-tips', [
-              div('.tip-chip', 'Blue area = Type I error'),
-              div('.tip-chip', 'Red area = Type II error'),
-              div('.tip-chip', 'Power = 1 - beta'),
+            div('.output-dock', [
+              div('.output-heading', [
+                p('.eyebrow', 'Model output'),
+                h2('Decision regions and overlapping distributions'),
+                p('The blue curve represents the null hypothesis, the red curve the true distribution, and the shaded regions show the two kinds of error.'),
+              ]),
+              div('.chart-frame', [chart]),
+            ]),
+            div('.metrics-grid', [
+              div('.metric-card', [
+                span('.metric-label', 'Alpha'),
+                span('.metric-value', formatRate(state.computed.typeOneErrorRate)),
+                small('.metric-note', 'Probability of rejecting H0 when H0 is true.'),
+              ]),
+              div('.metric-card', [
+                span('.metric-label', 'Beta'),
+                span('.metric-value', formatRate(state.computed.typeTwoErrorRate)),
+                small('.metric-note', 'Probability of missing a real effect.'),
+              ]),
+              div('.metric-card', [
+                span('.metric-label', 'Power'),
+                span('.metric-value', formatRate(state.computed.power)),
+                small('.metric-note', 'Probability of correctly detecting the effect.'),
+              ]),
+              div('.metric-card', [
+                span('.metric-label', 'Effect Size'),
+                span('.metric-value', formatNumber(state.computed.effectSize)),
+                small('.metric-note', 'Distance between true mean and null mean.'),
+              ]),
             ]),
           ]),
-
-          div('.lesson-banner', [
-            div('.lesson-meta', [
-              div('.lesson-label', 'Current scenario'),
-              h2('.lesson-title', 'Two distributions, one decision rule'),
-              p(
-                '.lesson-headline',
-                'Use the null distribution to set the critical boundary, then inspect how often the true distribution falls on the wrong side.'
-              ),
-              p(
-                '.lesson-prompt',
-                'A smaller alpha usually protects against false positives, but can make false negatives more likely unless the effect size is large enough.'
-              ),
+          div('.teaching-area', [
+            div('.teaching-panel.parameter-panel', [
+              p('.eyebrow', 'Parameters'),
+              div('.test-type-tabs', [
+                div('.test-type-tabs__label', 'Hypothesis'),
+                div('.test-type-tabs__buttons', [
+                  h('button.test-type-tab', {
+                    attrs: {
+                      type: 'button',
+                      'data-test-type': 'right-tailed',
+                      'data-active': String(state.config.testType === 'right-tailed'),
+                    },
+                  }, 'One-sided'),
+                  h('button.test-type-tab', {
+                    attrs: {
+                      type: 'button',
+                      'data-test-type': 'two-tailed',
+                      'data-active': String(state.config.testType === 'two-tailed'),
+                    },
+                  }, 'Two-sided'),
+                ]),
+              ]),
+              panel,
             ]),
-            div('.lesson-stats', [
-              div('.lesson-stat', [
-                span('.lesson-stat-label', 'Test type'),
-                span('.lesson-stat-value', state.config.testType.replace('-', ' ')),
-              ]),
-              div('.lesson-stat', [
-                span('.lesson-stat-label', 'Critical value'),
-                span('.lesson-stat-value', getCriticalValueLabel(state)),
-              ]),
+            div('.teaching-panel', [
+              p('.eyebrow', 'Concept + key idea'),
+              h2('Two kinds of error'),
+              p('A Type I error rejects a true null hypothesis. A Type II error fails to reject the null when a real effect exists.'),
+              h3('Alpha and power trade off'),
+              p(getInterpretation(state)),
+              p(getStrategyTip(state)),
             ]),
-          ]),
-
-          div('.content-grid', [
-            div('.control-column', [panel]),
-            div('.main-column', [
-              div('.chart-card', [
-                div('.chart-card-header', [
-                  h3('.chart-card-title', 'Decision regions and overlapping distributions'),
-                  p(
-                    '.chart-card-subtitle',
-                    'The blue curve represents the null hypothesis, the red curve the true distribution, and the shaded regions show the two kinds of error.'
-                  ),
-                ]),
-                chart,
-                div('.chart-legend', [
-                  div('.legend-item', [
-                    span('.legend-swatch.legend-swatch--blue'),
-                    span('Null distribution / Type I error'),
-                  ]),
-                  div('.legend-item', [
-                    span('.legend-swatch.legend-swatch--red'),
-                    span('True distribution / Type II error'),
-                  ]),
-                  div('.legend-item', [
-                    span('.legend-swatch.legend-swatch--line'),
-                    span('Critical boundary'),
-                  ]),
+            div('.teaching-panel', [
+              p('.eyebrow', 'Formula'),
+              div('.latex-formula', [
+                div('.math-expression', [
+                  span('Power = 1 −'),
+                  span('.math-symbol', 'β'),
                 ]),
               ]),
-
-              div('.stats-grid', [
-                div('.metric-card', [
-                  span('.metric-label', 'Alpha'),
-                  span('.metric-value', formatRate(state.computed.typeOneErrorRate)),
-                  small('.metric-note', 'Probability of rejecting H0 when H0 is true.'),
+              p(`Current test: ${state.config.testType.replace('-', ' ')}. Critical value: ${getCriticalValueLabel(state)}.`),
+            ]),
+            div('.teaching-panel', [
+              p('.eyebrow', 'How to read this'),
+              h3('Current hypotheses'),
+              div('.concept-strip', [
+                div('.concept-item', [
+                  span('.concept-name', 'H0'),
+                  span('.concept-value', state.computed.hypothesisText.H0Text),
                 ]),
-                div('.metric-card', [
-                  span('.metric-label', 'Beta'),
-                  span('.metric-value', formatRate(state.computed.typeTwoErrorRate)),
-                  small('.metric-note', 'Probability of missing a real effect.'),
-                ]),
-                div('.metric-card', [
-                  span('.metric-label', 'Power'),
-                  span('.metric-value', formatRate(state.computed.power)),
-                  small('.metric-note', 'Probability of correctly detecting the effect.'),
-                ]),
-                div('.metric-card', [
-                  span('.metric-label', 'Effect Size'),
-                  span('.metric-value', formatNumber(state.computed.effectSize)),
-                  small('.metric-note', 'Distance between true mean and null mean.'),
-                ]),
-              ]),
-
-              div('.explanation-card', [
-                h3('.explanation-title', 'How to read this view'),
-                p(
-                  '.explanation-text',
-                  'Move the true mean away from the null mean to increase power. Move alpha downward to shrink the rejection region. The best classroom discussions happen when students explain why those two goals can compete.'
-                ),
-                div('.teaching-callout', [
-                  h3('.callout-title', 'Current interpretation'),
-                  p('.callout-text', getInterpretation(state)),
-                  p('.callout-text.callout-text--secondary', getStrategyTip(state)),
-                ]),
-                div('.concept-strip', [
-                  div('.concept-item', [
-                    span('.concept-name', 'H0'),
-                    span('.concept-value', state.computed.hypothesisText.H0Text),
-                  ]),
-                  div('.concept-item', [
-                    span('.concept-name', 'H1'),
-                    span('.concept-value', state.computed.hypothesisText.H1Text),
-                  ]),
+                div('.concept-item', [
+                  span('.concept-name', 'H1'),
+                  span('.concept-value', state.computed.hypothesisText.H1Text),
                 ]),
               ]),
             ]),

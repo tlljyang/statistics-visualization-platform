@@ -11,7 +11,7 @@ export function makeConfigDriver(): () => Stream<Config> {
     return xs.of({
       width: 760,
       height: 460,
-      testType: "two-tailed",
+      testType: "right-tailed",
     });
   };
 }

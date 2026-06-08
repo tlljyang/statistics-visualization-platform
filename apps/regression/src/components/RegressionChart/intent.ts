@@ -9,7 +9,20 @@ import type {
   PointerCoordinates,
   PointHoverAction,
 } from './types';
-import { DEFAULT_MARGINS } from '../../d3/regression';
+function getChartCoordinates(pointerEvent: PointerEvent): PointerCoordinates {
+  const svgElement = pointerEvent.currentTarget as SVGSVGElement;
+  const rect = svgElement.getBoundingClientRect();
+  const viewBox = svgElement.viewBox.baseVal;
+  const scaleX = viewBox.width / rect.width;
+  const scaleY = viewBox.height / rect.height;
+  const marginLeft = Number(svgElement.dataset.marginLeft ?? 0);
+  const marginTop = Number(svgElement.dataset.marginTop ?? 0);
+
+  return {
+    x: (pointerEvent.clientX - rect.left) * scaleX - marginLeft,
+    y: (pointerEvent.clientY - rect.top) * scaleY - marginTop,
+  };
+}
 
 export function intent(sources: {
   DOM: DOMSource;
@@ -22,20 +35,14 @@ export function intent(sources: {
     .events('pointerdown')
     .map((ev: Event) => {
       const pointerEvent = ev as PointerEvent;
-      return {
-        x: pointerEvent.offsetX - DEFAULT_MARGINS.left,
-        y: pointerEvent.offsetY - DEFAULT_MARGINS.top,
-      };
+      return getChartCoordinates(pointerEvent);
     });
 
   const pointerMove$: Stream<PointerCoordinates> = $el(sources.DOM, 'svg')
     .events('pointermove')
     .map((ev: Event) => {
       const pointerEvent = ev as PointerEvent;
-      return {
-        x: pointerEvent.offsetX - DEFAULT_MARGINS.left,
-        y: pointerEvent.offsetY - DEFAULT_MARGINS.top,
-      };
+      return getChartCoordinates(pointerEvent);
     })
     .compose(throttle(16)); // ~60fps
 
@@ -43,10 +50,7 @@ export function intent(sources: {
     .events('pointerup')
     .map((ev: Event) => {
       const pointerEvent = ev as PointerEvent;
-      return {
-        x: pointerEvent.offsetX - DEFAULT_MARGINS.left,
-        y: pointerEvent.offsetY - DEFAULT_MARGINS.top,
-      };
+      return getChartCoordinates(pointerEvent);
     });
 
   // ==================== Point hover events (NEW) ====================

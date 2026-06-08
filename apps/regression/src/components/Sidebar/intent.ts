@@ -107,6 +107,10 @@ export function intent(sources: SidebarSources): SidebarActions {
     .events('change')
     .mapTo(null as null);
 
+  const toggleOutliers$ = $el(sources.DOM, '.outlier-toggle')
+    .events('change')
+    .mapTo(null as null);
+
   // Clear custom line button
   const clearCustomLine$ = $el(sources.DOM, '.clear-custom-line')
     .events('click')
@@ -117,6 +121,7 @@ export function intent(sources: SidebarSources): SidebarActions {
     datasetsLoaded$,
     selectDataset$,
     toggleRegression$,
+    toggleOutliers$,
     clearCustomLine$,
   };
 }

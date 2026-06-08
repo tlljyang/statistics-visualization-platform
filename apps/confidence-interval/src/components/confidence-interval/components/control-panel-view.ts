@@ -2,7 +2,7 @@ import { div, input, button, select, option } from "@cycle/dom";
 import type { ControlPanelState } from "../../control-panel/types";
 
 export function controlPanelView(state: ControlPanelState) {
-  const { sampleSize, populationSD, confidenceLevel, coverage, collapsed } = state;
+  const { sampleSize, populationSD, confidenceLevel, collapsed } = state;
 
   const sliderCard = (
     id: string,
@@ -58,20 +58,17 @@ export function controlPanelView(state: ControlPanelState) {
                 "Higher confidence captures the true mean more often, but also widens the interval.",
               ]),
               select("#confidenceLevel.form-select.control-panel__select", [
-                  option({ attrs: { value: "0.8" } }, ["80%"]),
-                  option({ attrs: { value: "0.9" } }, ["90%"]),
-                  option({ attrs: { value: "0.95", selected: true } }, ["95%"]),
-                  option({ attrs: { value: "0.99" } }, ["99%"]),
+                  option({ attrs: { value: "0.8", selected: confidenceLevel === 0.8 } }, ["80%"]),
+                  option({ attrs: { value: "0.9", selected: confidenceLevel === 0.9 } }, ["90%"]),
+                  option({ attrs: { value: "0.95", selected: confidenceLevel === 0.95 } }, ["95%"]),
+                  option({ attrs: { value: "0.99", selected: confidenceLevel === 0.99 } }, ["99%"]),
                 ]),
             ]),
-            div(".control-panel__actions", [
-              button("#generateSample.btn.btn-primary.w-100.mb-2", "Generate 1 Sample"),
-              button("#generateMultiple.btn.btn-outline-primary.w-100.mb-2", "Generate 20 Samples"),
-              button("#reset.btn.btn-outline-danger.w-100", "Reset"),
-            ]),
-            div(".control-panel__coverage-card", [
-              div(".control-panel__coverage-label", ["Observed Coverage"]),
-              div("#statsDisplay.control-panel__coverage-value", [`${(coverage * 100).toFixed(1)}%`]),
+            div(".control-panel__info-box", [
+              div(".control-panel__info-icon", ["i"]),
+              div([
+                "A 95% confidence level means that over the long run, about 95% of intervals constructed this way will contain the true population mean.",
+              ]),
             ]),
           ])
         : null,

@@ -1,4 +1,4 @@
-import { div, h1, h2, h3, p, small, span, svg } from "@cycle/dom";
+import { button, div, h1, h2, h3, p, small, span, svg } from "@cycle/dom";
 import type { VNode } from "@cycle/dom";
 import type { Stream } from "xstream";
 import * as d3 from "d3";
@@ -39,62 +39,42 @@ function view(state$: Stream<State>): Stream<VNode> {
           ? "Coverage is currently at or above the target confidence level, so the long-run behavior is looking healthy."
           : "Coverage is currently below the target confidence level, which is a good prompt to discuss randomness and finite samples.";
 
-    return div(".confidence-page-shell", [
-      div(".page-container", [
-        div(".hero-panel", [
-          div(".hero-copy", [
-            p(".eyebrow", "Interactive Estimation Lab"),
-            h1(".hero-title", "Turn repeated sampling into something students can actually see."),
-            p(
-              ".hero-text",
-              "Generate confidence intervals one sample at a time, compare observed coverage to the target level, and use the chart to explain why some intervals miss the true mean.",
-            ),
-          ]),
-          div(".hero-tips", [
-            div(".tip-chip", "Blue dashed line = true mean"),
-            div(".tip-chip", "Green interval = covers μ"),
-            div(".tip-chip", "Red interval = misses μ"),
-          ]),
-        ]),
-
-        div(".lesson-banner", [
-          div(".lesson-meta", [
-            div(".lesson-label", "Current lesson"),
-            h2(".lesson-title", "Repeated samples produce different intervals"),
-            p(
-              ".lesson-headline",
-              "Confidence is about the long-run capture rate of the method, not the probability that one finished interval is correct.",
-            ),
-            p(
-              ".lesson-prompt",
-              "Ask students what changes when you increase the sample size, raise the confidence level, or make the population more variable.",
-            ),
-          ]),
-          div(".lesson-stats", [
-            div(".lesson-stat", [
-              span(".lesson-stat-label", "Population Mean"),
-              span(".lesson-stat-value", config.populationMean.toFixed(1)),
-            ]),
-            div(".lesson-stat", [
-              span(".lesson-stat-label", "Target Confidence"),
-              span(".lesson-stat-value", `${Math.round(state.confidenceLevel * 100)}%`),
+    return div(".module-shell", [
+      div(".module-layout", [
+        div(".experiment-board", [
+          div(".experiment-header", [
+            div([
+              p(".eyebrow", "Core Visualizer"),
+              h1("Confidence Interval"),
+              p(".module-kicker", "Understand uncertainty through repeated sampling ✦"),
+              p(".module-description", "Confidence intervals quantify uncertainty about a population parameter by constructing an interval from sample data. Repeated sampling shows how often our intervals capture the true value."),
             ]),
           ]),
-        ]),
-
-        div(".content-grid", [
-          controlPanelView(state),
-          div(".main-column", [
-            div(".chart-card", [
-              div(".chart-card-header", [
-                h3(".chart-card-title", "Confidence intervals across repeated samples"),
-                p(
-                  ".chart-card-subtitle",
-                  "Each horizontal interval comes from a different random sample. Watch how the capture pattern changes as the controls move.",
-                ),
+          div(".output-dock", [
+            div(".output-heading", [
+              div([
+                p(".eyebrow", "Model output"),
+                h2("Confidence intervals across repeated samples"),
+                p("Each horizontal interval comes from a different random sample. The vertical dashed line marks the true mean."),
               ]),
-              div(".chart-shell", [
-                svg({ attrs: { width, height, viewBox: `0 0 ${width} ${height}` } }, [
+              span(".sample-pill", `Samples: ${sampleCount}`),
+            ]),
+            div(".chart-legend", [
+              span(".legend-item", [
+                span(".legend-swatch.legend-swatch--capture"),
+                span("Captures true mean"),
+              ]),
+              span(".legend-item", [
+                span(".legend-swatch.legend-swatch--miss"),
+                span("Misses true mean"),
+              ]),
+              span(".legend-item", [
+                span(".legend-swatch.legend-swatch--true"),
+                span(`True Mean (μ = ${config.populationMean})`),
+              ]),
+            ]),
+            div(".chart-frame", [
+              svg({ attrs: { width, height, viewBox: `0 0 ${width} ${height}` } }, [
                   {
                     sel: "g",
                     data: {
@@ -180,54 +160,93 @@ function view(state$: Stream<State>): Stream<VNode> {
                     },
                   }, "Sample index"),
                 ]),
+            ]),
+          ]),
+          div(".metrics-grid", [
+            div(".metric-card", [
+              span(".metric-label", "Observed Coverage"),
+              span(".metric-value", `${(state.coverage * 100).toFixed(1)}%`),
+              small(".metric-note", "Share of generated intervals that contain the true mean."),
+            ]),
+            div(".metric-card", [
+              span(".metric-label", "Samples Drawn"),
+              span(".metric-value", String(sampleCount)),
+              small(".metric-note", "More samples make the long-run pattern easier to see."),
+            ]),
+            div(".metric-card", [
+              span(".metric-label", "Average Interval Width"),
+              span(".metric-value", averageWidth.toFixed(2)),
+              small(".metric-note", "Higher confidence or more variability usually widens intervals."),
+            ]),
+            div(".metric-card", [
+              span(".metric-label", "Z Multiplier"),
+              span(".metric-value", zValue.toFixed(2)),
+              small(".metric-note", "Critical value used to construct each interval."),
+            ]),
+          ]),
+        ]),
+        div(".teaching-area", [
+          div(".teaching-panel.parameter-panel", [
+            p(".eyebrow", "Parameters"),
+            controlPanelView(state),
+            div(".studio-control-bar.studio-control-bar--side", [
+              div(".studio-control-bar__buttons", [
+                button("#generateSample.studio-button.studio-button--primary", [
+                  span(".studio-button__icon", "+"),
+                  span("Generate 1 Sample"),
+                ]),
+                button("#generateMultiple.studio-button.studio-button--secondary", [
+                  span(".studio-button__icon", "⋯"),
+                  span("Generate 20 Samples"),
+                ]),
+                button("#reset.studio-button.studio-button--danger", [
+                  span(".studio-button__icon", "↺"),
+                  span("Reset"),
+                ]),
               ]),
-              div(".chart-legend", [
-                div(".legend-item", [span(".legend-swatch.legend-swatch--cover"), span("Interval captures true mean")]),
-                div(".legend-item", [span(".legend-swatch.legend-swatch--miss"), span("Interval misses true mean")]),
-                div(".legend-item", [span(".legend-swatch.legend-swatch--line"), span("True mean")]),
+              span(".studio-control-bar__hint", "Use repeated samples to compare interval behavior with the target confidence level."),
+            ]),
+          ]),
+          div(".teaching-panel", [
+            p(".eyebrow", "Concept + key idea"),
+            div(".concept-block", [
+              span(".concept-icon", "◎"),
+              div([
+                h2("What is a Confidence Interval?"),
+                p("A confidence interval is an interval-built estimate for an unknown population parameter from sample data."),
               ]),
             ]),
-
-            div(".stats-grid", [
-              div(".metric-card", [
-                span(".metric-label", "Observed Coverage"),
-                span(".metric-value", `${(state.coverage * 100).toFixed(1)}%`),
-                small(".metric-note", "Share of generated intervals that contain the true mean."),
-              ]),
-              div(".metric-card", [
-                span(".metric-label", "Samples Drawn"),
-                span(".metric-value", String(sampleCount)),
-                small(".metric-note", "More samples make the long-run pattern easier to see."),
-              ]),
-              div(".metric-card", [
-                span(".metric-label", "Average Interval Width"),
-                span(".metric-value", averageWidth.toFixed(2)),
-                small(".metric-note", "Wider intervals usually come from higher confidence or more variability."),
-              ]),
-              div(".metric-card", [
-                span(".metric-label", "Z Multiplier"),
-                span(".metric-value", zValue.toFixed(2)),
-                small(".metric-note", "Critical value used to construct each interval."),
+            div(".concept-divider"),
+            div(".concept-block", [
+              span(".concept-icon", "▥"),
+              div([
+                h3("Coverage is Long-Run Behavior"),
+                p("The confidence level describes how often this method captures the true parameter across repeated samples, not the probability for any one interval."),
               ]),
             ]),
-
-            div(".explanation-card", [
-              h3(".explanation-title", "How to teach with this view"),
-              p(
-                ".explanation-text",
-                "Generate a handful of intervals first, ask students to guess whether the method is working, then add many more samples and compare observed coverage with the target confidence level.",
-              ),
-              div(".teaching-callout", [
-                h3(".callout-title", "Current interpretation"),
-                p(".callout-text", interpretation),
-                p(
-                  ".callout-text.callout-text--secondary",
-                  sampleCount === 0
-                    ? "Confidence level controls the method before any intervals are generated."
-                    : `${misses} interval${misses === 1 ? "" : "s"} currently miss the true mean.`,
-                ),
+          ]),
+          div(".teaching-panel", [
+            p(".eyebrow", "Formula"),
+            div(".latex-formula", [
+              div(".math-expression", [
+                span("estimate"),
+                span(".math-symbol", "±"),
+                span("critical value"),
+                span(".math-symbol", "×"),
+                span("SE"),
               ]),
             ]),
+            p(`Current critical value: ${zValue.toFixed(2)}. Population mean shown in the chart: ${config.populationMean.toFixed(1)}.`),
+          ]),
+          div(".teaching-panel", [
+            p(".eyebrow", "How to read this"),
+            h3("Current interpretation"),
+            p(interpretation),
+            p(sampleCount === 0 ? "Generate samples to start the coverage conversation." : `${misses} interval${misses === 1 ? "" : "s"} currently miss the true mean.`),
+          ]),
+          div(".teaching-panel.learning-note", [
+            p(".eyebrow", "Learning note"),
+            p("Try changing the sample size and population SD to see how interval width and coverage behave in practice."),
           ]),
         ]),
       ]),

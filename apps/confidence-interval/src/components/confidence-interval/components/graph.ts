@@ -39,15 +39,19 @@ export function drawCIs(container: any, data: RenderData[]): void {
     .attr("y2", (d: RenderData) => d.y)
     .attr("x1", (d: RenderData) => d.x1)
     .attr("x2", (d: RenderData) => d.x2)
-    .style("stroke", (d: RenderData) => (d.containsMean ? "green" : "red"));
+    .style("stroke", (d: RenderData) => (d.containsMean ? "var(--sage)" : "var(--danger)"))
+    .style("stroke-width", 2)
+    .style("stroke-linecap", "round");
 
   ciEnter
     .append("circle")
     .attr("class", "sample-mean")
     .attr("cx", (d: RenderData) => d.meanX)
     .attr("cy", (d: RenderData) => d.y)
-    .attr("r", 4)
-    .style("fill", "red");
+    .attr("r", 5.5)
+    .style("fill", (d: RenderData) => (d.containsMean ? "var(--deep-teal)" : "var(--danger)"))
+    .style("stroke", "var(--chart-bg)")
+    .style("stroke-width", 2);
 
   // Update existing elements
   ciLines
@@ -58,14 +62,17 @@ export function drawCIs(container: any, data: RenderData[]): void {
     .attr("y2", (d: RenderData) => d.y)
     .attr("x1", (d: RenderData) => d.x1)
     .attr("x2", (d: RenderData) => d.x2)
-    .style("stroke", (d: RenderData) => (d.containsMean ? "green" : "red"));
+    .style("stroke", (d: RenderData) => (d.containsMean ? "var(--sage)" : "var(--danger)"))
+    .style("stroke-width", 2)
+    .style("stroke-linecap", "round");
 
   ciLines
     .select(".sample-mean")
     .transition()
     .duration(500)
     .attr("cx", (d: RenderData) => d.meanX)
-    .attr("cy", (d: RenderData) => d.y);
+    .attr("cy", (d: RenderData) => d.y)
+    .style("fill", (d: RenderData) => (d.containsMean ? "var(--deep-teal)" : "var(--danger)"));
 
   const ciExit = ciLines.exit();
   ciExit.select(".ci-line").remove();
@@ -81,9 +88,9 @@ export function drawTrueMean(container: any, x: number, y: number, populationMea
   container
     .append("line")
     .attr("class", "true-mean")
-    .attr("stroke", "#00c")
-    .attr("stroke-width", 2)
-    .attr("stroke-dasharray", "5,5")
+    .attr("stroke", "var(--chart-blue)")
+    .attr("stroke-width", 1.8)
+    .attr("stroke-dasharray", "6,7")
     .attr("x1", x)
     .attr("y1", 0)
     .attr("x2", x)
@@ -94,6 +101,6 @@ export function drawTrueMean(container: any, x: number, y: number, populationMea
     .attr("class", "true-mean-text")
     .attr("x", x)
     .attr("y", 15)
-    .attr("fill", "#00c")
+    .attr("fill", "var(--chart-blue)")
     .text(`True Mean (μ = ${populationMean})`);
 }

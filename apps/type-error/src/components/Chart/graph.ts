@@ -16,7 +16,7 @@ function drawNullDistribution(container: any, data: DistributionPoint[], scales:
         .x((d) => scales.xScale(d.x))
         .y((d) => scales.yScale(d.y)),
     )
-    .attr("stroke", "blue")
+    .attr("stroke", "var(--chart-blue)")
     .attr("fill", "none")
     .attr("stroke-width", 2);
 }
@@ -53,7 +53,7 @@ function drawTrueDistribution(container: any, data: DistributionPoint[], scales:
         .x((d) => scales.xScale(d.x))
         .y((d) => scales.yScale(d.y)),
     )
-    .attr("stroke", "red")
+    .attr("stroke", "var(--teal)")
     .attr("fill", "none")
     .attr("stroke-width", 2);
 }
@@ -89,7 +89,7 @@ function drawCriticalLine(container: any, criticalValue: number[], scales: Scale
     .attr("x2", (d: number) => scales.xScale(d))
     .attr("y1", scales.yScale(0))
     .attr("y2", scales.yScale(0.5))
-    .attr("stroke", "black")
+    .attr("stroke", "var(--text-primary)")
     .attr("stroke-dasharray", "5,5");
 }
 
@@ -150,8 +150,8 @@ function drawType1ErrorArea(
     .datum(type1ErrorArea)
     .attr("class", "type1-error")
     .attr("d", line)
-    .attr("fill", "blue")
-    .attr("opacity", 0.3);
+    .attr("fill", "var(--lavender)")
+    .attr("opacity", 0.24);
 }
 
 export function Type1ErrorArea(props: {
@@ -215,8 +215,8 @@ function drawType2ErrorArea(
     .datum(type2ErrorArea)
     .attr("class", "type2-error")
     .attr("d", line)
-    .attr("fill", "red")
-    .attr("opacity", 0.3);
+    .attr("fill", "var(--danger)")
+    .attr("opacity", 0.24);
 }
 
 export function Type2ErrorArea(props: {

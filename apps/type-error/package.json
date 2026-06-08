@@ -1,7 +1,7 @@
 {
-  "name": "cyclejs-app",
+  "name": "type-error-visualization",
   "version": "1.0.0",
-  "description": "Vite + Cycle.js + TypeScript project",
+  "description": "Interactive visualization of Type I and Type II errors in statistical hypothesis testing",
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",

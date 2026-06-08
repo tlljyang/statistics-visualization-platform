@@ -7,6 +7,57 @@ body {
   color: #1f2937;
 }
 
+/* Compact workbench header: keep focus on the central visualization. */
+@media (min-width: 760px) {
+  .experiment-board {
+    gap: 10px !important;
+  }
+
+  .experiment-header {
+    padding-bottom: 8px !important;
+  }
+
+  .experiment-header .eyebrow,
+  .output-heading .eyebrow {
+    margin: 0 !important;
+    font-size: 10px !important;
+    letter-spacing: 0.12em !important;
+  }
+
+  .experiment-header h1 {
+    margin: 0 !important;
+    font-size: clamp(30px, 3.2vw, 42px) !important;
+    line-height: 0.96 !important;
+  }
+
+  .experiment-header p:not(.eyebrow),
+  .output-heading p {
+    display: none !important;
+  }
+
+  .output-dock {
+    gap: 8px !important;
+  }
+
+  .output-heading {
+    display: flex !important;
+    align-items: baseline !important;
+    justify-content: space-between !important;
+    gap: 12px !important;
+    margin: 0 !important;
+  }
+
+  .output-heading h2 {
+    margin: 0 !important;
+    font-size: clamp(18px, 1.8vw, 24px) !important;
+    line-height: 1.05 !important;
+  }
+
+  .chart-frame {
+    min-height: 0 !important;
+  }
+}
+
 #app {
   min-height: 100vh;
 }
@@ -438,5 +489,683 @@ body {
   .stats-grid,
   .concept-strip {
     grid-template-columns: 1fr;
+  }
+}
+
+.module-shell {
+  min-height: 100vh;
+  padding: 18px;
+  background:
+    radial-gradient(circle at 18% 0, rgba(19, 111, 99, 0.12), transparent 22rem),
+    linear-gradient(135deg, #fbfdfc 0%, #eef4f2 100%);
+}
+
+.module-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 18px;
+  align-items: start;
+}
+
+.experiment-area,
+.teaching-area {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+}
+
+.teaching-area {
+  position: sticky;
+  top: 18px;
+}
+
+.module-intro,
+.experiment-panel,
+.teaching-panel,
+.metric-card {
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 14px 32px rgba(15, 23, 42, 0.06);
+}
+
+.module-intro,
+.experiment-panel,
+.teaching-panel {
+  padding: 16px;
+}
+
+.module-intro h1 {
+  margin: 0 0 8px;
+  color: #10201d;
+  font-size: 32px;
+  font-weight: 800;
+  line-height: 1.05;
+}
+
+.module-intro p:last-child,
+.result-narrative,
+.teaching-panel p {
+  color: #53605c;
+  line-height: 1.5;
+}
+
+.eyebrow {
+  margin: 0 0 8px;
+  color: #66736f;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.section-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 12px;
+}
+
+.section-heading h2,
+.teaching-panel h2,
+.teaching-panel h3 {
+  margin: 0;
+  color: #14231f;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.chart-frame {
+  border: 1px solid #e0e7e5;
+  border-radius: 10px;
+  background: #ffffff;
+  overflow: auto;
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 10px;
+}
+
+@media (max-width: 960px) {
+  .module-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .teaching-area {
+    position: static;
+  }
+}
+
+.experiment-board {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.93);
+  box-shadow: 0 14px 32px rgba(15, 23, 42, 0.06);
+}
+
+.experiment-header {
+  border-bottom: 1px solid #e0e7e5;
+  padding-bottom: 12px;
+}
+
+.experiment-header h1 {
+  margin: 0 0 6px;
+  color: #10201d;
+  font-size: 30px;
+  font-weight: 850;
+  line-height: 1.05;
+}
+
+.parameter-panel {
+  display: grid;
+  gap: 8px;
+  align-self: start;
+  padding: 10px;
+  border: 1px solid #e0e7e5;
+  border-radius: 10px;
+  background: #f7faf9;
+}
+
+.output-heading {
+  margin-bottom: 10px;
+}
+
+.output-heading h2 {
+  margin: 0 0 5px;
+  color: #14231f;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.parameter-panel .control-panel,
+.parameter-panel .control-card {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.parameter-panel .control-panel__title,
+.parameter-panel .control-panel__intro,
+.parameter-panel .control-card__title,
+.parameter-panel .control-card__description,
+.parameter-panel .control-description {
+  display: none;
+}
+
+.parameter-panel label,
+.parameter-panel .control-group,
+.parameter-panel .control-row {
+  font-size: 12px;
+}
+
+.parameter-panel input,
+.parameter-panel select,
+.parameter-panel button {
+  min-height: 30px;
+  font-size: 12px;
+}
+
+.metrics-grid {
+  border-top: 1px solid #e0e7e5;
+  padding-top: 12px;
+}
+
+.latex-formula {
+  margin: 2px 0 10px;
+  padding: 12px;
+  border: 1px solid #cfe0dc;
+  border-radius: 9px;
+  color: #0f4f45;
+  background: #ffffff;
+  font-family: "Cambria Math", "STIX Two Math", Georgia, serif;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.35;
+  text-align: center;
+}
+
+.math-expression {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.38em;
+  min-height: 2.4em;
+}
+
+.math-symbol {
+  font-size: 1.12em;
+  line-height: 1;
+}
+
+.math-frac {
+  display: inline-grid;
+  grid-template-rows: auto auto;
+  align-items: center;
+  min-width: 4.8em;
+  line-height: 1.05;
+  vertical-align: middle;
+}
+
+.math-num,
+.math-den {
+  display: block;
+  padding: 0.1em 0.42em;
+  text-align: center;
+}
+
+.math-num {
+  border-bottom: 2px solid currentColor;
+}
+
+.math-expression sub,
+.math-expression sup {
+  font-size: 0.65em;
+  line-height: 0;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+}
+
+body {
+  overflow: hidden;
+}
+
+.module-shell {
+  height: 100vh;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.module-layout {
+  height: calc(100vh - 36px);
+  align-items: stretch;
+  overflow: hidden;
+}
+
+.experiment-board {
+  max-height: 100%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.teaching-area {
+  position: static;
+  height: 100%;
+  max-height: 100%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  align-content: start;
+  padding-right: 2px;
+}
+
+.parameter-panel {
+  align-self: auto;
+  gap: 10px;
+}
+
+.parameter-panel .control-panel {
+  display: grid;
+  gap: 10px;
+}
+
+.parameter-panel .control-panel__slider {
+  margin: 0;
+  padding: 0 0 10px;
+  border: 0;
+  border-bottom: 1px solid #e0e7e5;
+  border-radius: 0;
+  background: transparent;
+}
+
+.parameter-panel .control-panel__slider:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.parameter-panel .control-panel__label-row {
+  gap: 8px;
+}
+
+.parameter-panel .control-panel__label {
+  color: #14231f;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.parameter-panel .control-panel__value {
+  color: #1d4ed8;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.parameter-panel .control-panel__hint {
+  margin: 3px 0 7px;
+  color: #53605c;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.parameter-panel .control-panel__input {
+  min-height: 18px;
+}
+
+@media (max-width: 1100px) {
+  body {
+    overflow: auto;
+  }
+
+  .module-shell {
+    height: auto;
+    min-height: 100vh;
+    overflow: visible;
+  }
+
+  .module-layout {
+    height: auto;
+    overflow: visible;
+  }
+
+  .experiment-board,
+  .teaching-area {
+    max-height: none;
+    overflow: visible;
+  }
+
+  .teaching-area {
+    height: auto;
+  }
+}
+
+/* Final compact workbench header override. */
+@media (min-width: 760px) {
+  .experiment-board { gap: 10px !important; }
+  .experiment-header { padding-bottom: 8px !important; }
+  .experiment-header .eyebrow,
+  .output-heading .eyebrow {
+    margin: 0 !important;
+    font-size: 10px !important;
+    letter-spacing: 0.12em !important;
+  }
+  .experiment-header h1 {
+    margin: 0 !important;
+    font-size: clamp(30px, 3.2vw, 42px) !important;
+    line-height: 0.96 !important;
+  }
+  .experiment-header p:not(.eyebrow),
+  .output-heading p {
+    display: none !important;
+  }
+  .output-dock { gap: 8px !important; }
+  .output-heading {
+    display: flex !important;
+    align-items: baseline !important;
+    justify-content: space-between !important;
+    gap: 12px !important;
+    margin: 0 !important;
+  }
+  .output-heading h2 {
+    margin: 0 !important;
+    font-size: clamp(18px, 1.8vw, 24px) !important;
+    line-height: 1.05 !important;
+  }
+  .chart-frame { min-height: 0 !important; }
+}
+
+/* Warm academic studio theme for the Type I / II module. */
+:root {
+  --bg: #f8f3ea;
+  --card: rgba(255, 252, 246, 0.92);
+  --card-strong: #fffdf8;
+  --chart-bg: #fffaf1;
+  --text-primary: #252822;
+  --text-secondary: #696e63;
+  --border: rgba(90, 80, 60, 0.13);
+  --sage: #6f8f7a;
+  --sage-soft: #eef4ec;
+  --teal: #2f6f64;
+  --soft-teal: #ddede8;
+  --lavender: #8d75b5;
+  --soft-lavender: #f0e9f7;
+  --danger: #c8665a;
+  --chart-blue: #4b73d9;
+  --shadow-soft: 0 18px 44px rgba(40, 35, 25, 0.08);
+  color: var(--text-primary);
+  background: var(--bg);
+  font-family:
+    "Plus Jakarta Sans", Inter, ui-sans-serif, system-ui, -apple-system,
+    BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+body {
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 14% 4%, rgba(141, 117, 181, 0.13), transparent 24rem),
+    radial-gradient(circle at 88% 8%, rgba(111, 143, 122, 0.14), transparent 28rem),
+    linear-gradient(135deg, #faf6ef 0%, #f6f1e8 100%);
+  color: var(--text-primary);
+}
+
+.module-shell {
+  height: 100vh;
+  min-height: 0;
+  padding: 18px;
+  overflow: hidden;
+  background: transparent;
+}
+
+.module-layout {
+  grid-template-columns: minmax(0, 1fr) 350px;
+  gap: 18px;
+  align-items: stretch;
+  height: calc(100vh - 36px);
+  overflow: hidden;
+}
+
+.experiment-board,
+.teaching-panel,
+.metric-card {
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  background: var(--card);
+  box-shadow: var(--shadow-soft);
+  backdrop-filter: blur(10px);
+}
+
+.experiment-board {
+  gap: 18px;
+  max-height: 100%;
+  padding: 24px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.experiment-header {
+  padding-bottom: 18px;
+  border-bottom: 1px solid rgba(90, 80, 60, 0.1);
+}
+
+.eyebrow {
+  color: var(--lavender);
+  font-size: 12px;
+  font-weight: 850;
+  letter-spacing: 0.14em;
+}
+
+.experiment-header h1 {
+  color: var(--text-primary);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(42px, 4.7vw, 58px);
+  font-weight: 500;
+  letter-spacing: -0.04em;
+}
+
+.experiment-header p,
+.output-heading p,
+.teaching-panel p,
+.metric-note {
+  color: var(--text-secondary);
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.output-heading h2 {
+  color: var(--text-primary);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 28px;
+  font-weight: 500;
+}
+
+.chart-frame {
+  border: 1px solid rgba(90, 80, 60, 0.1);
+  border-radius: 22px;
+  background:
+    linear-gradient(180deg, rgba(255, 253, 248, 0.94), rgba(255, 250, 241, 0.96));
+}
+
+.metrics-grid {
+  gap: 12px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(90, 80, 60, 0.1);
+}
+
+.metric-card {
+  min-height: 92px;
+  padding: 15px;
+  border-radius: 18px;
+  background: rgba(255, 253, 248, 0.76);
+  box-shadow: none;
+}
+
+.metric-label {
+  color: var(--lavender);
+  font-size: 11px;
+  font-weight: 850;
+}
+
+.metric-value {
+  color: var(--text-primary);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 27px;
+  font-weight: 500;
+}
+
+.teaching-area {
+  gap: 14px;
+  height: 100%;
+  max-height: 100%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.teaching-panel {
+  padding: 20px;
+}
+
+.parameter-panel {
+  gap: 12px;
+}
+
+.parameter-panel .control-panel {
+  gap: 14px;
+}
+
+.parameter-panel .control-panel__slider {
+  padding-bottom: 12px;
+  border-bottom-color: rgba(90, 80, 60, 0.1);
+}
+
+.parameter-panel .control-panel__label {
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+.parameter-panel .control-panel__value {
+  min-width: 48px;
+  padding: 5px 9px;
+  border-radius: 999px;
+  color: var(--teal);
+  background: var(--sage-soft);
+  font-size: 13px;
+  text-align: center;
+}
+
+.parameter-panel .control-panel__hint {
+  color: var(--text-secondary);
+}
+
+.parameter-panel .control-panel__input {
+  accent-color: var(--sage);
+}
+
+.latex-formula {
+  border-color: rgba(111, 143, 122, 0.2);
+  border-radius: 18px;
+  color: var(--teal);
+  background: #fffdf8;
+}
+
+.concept-item {
+  border-color: rgba(90, 80, 60, 0.1);
+  border-radius: 16px;
+  background: rgba(238, 244, 236, 0.62);
+}
+
+.null-distribution {
+  stroke: var(--chart-blue);
+  fill: none;
+}
+
+.true-distribution {
+  stroke: var(--teal);
+  fill: none;
+}
+
+.type1-error {
+  fill: var(--lavender);
+  stroke: none;
+  opacity: 0.24;
+}
+
+.type2-error {
+  fill: var(--danger);
+  stroke: none;
+  opacity: 0.24;
+}
+
+.critical-line {
+  stroke: var(--text-primary);
+}
+
+.test-type-tabs {
+  display: grid;
+  gap: 8px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(90, 80, 60, 0.1);
+}
+
+.test-type-tabs__label {
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 850;
+}
+
+.test-type-tabs__buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px;
+}
+
+.test-type-tab {
+  min-height: 38px;
+  border: 1px solid rgba(90, 80, 60, 0.14);
+  border-radius: 13px;
+  color: var(--text-secondary);
+  background: #fffdf8;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.test-type-tab[data-active="true"] {
+  border-color: rgba(47, 111, 100, 0.28);
+  color: var(--teal);
+  background: var(--sage-soft);
+}
+
+@media (max-width: 1100px) {
+  body {
+    overflow: auto;
+  }
+
+  .module-shell {
+    height: auto;
+    min-height: 100vh;
+    overflow: visible;
+  }
+
+  .module-layout {
+    grid-template-columns: 1fr;
+    height: auto;
+    overflow: visible;
+  }
+
+  .experiment-board,
+  .teaching-area {
+    max-height: none;
+    overflow: visible;
+  }
+
+  .teaching-area {
+    height: auto;
   }
 }

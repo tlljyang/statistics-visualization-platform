@@ -1,0 +1,21 @@
+{
+  "id": "outlier-impact",
+  "name": "Outlier Impact Dataset",
+  "source": "Constructed classroom example for influence and outlier teaching",
+  "xLabel": "Study hours",
+  "yLabel": "Exam score",
+  "data": [
+    { "x": 1, "y": 48 },
+    { "x": 2, "y": 52 },
+    { "x": 3, "y": 58 },
+    { "x": 4, "y": 63 },
+    { "x": 5, "y": 69 },
+    { "x": 6, "y": 74 },
+    { "x": 7, "y": 79 },
+    { "x": 8, "y": 83 },
+    { "x": 9, "y": 88 },
+    { "x": 10, "y": 93 },
+    { "x": 11, "y": 38, "outlier": true },
+    { "x": 2.5, "y": 91, "outlier": true }
+  ]
+}

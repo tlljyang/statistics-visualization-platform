@@ -4,6 +4,7 @@ import {
   createDatasetChangeSink,
   createSelectedDatasetSink,
   createToggleRegressionSink,
+  createToggleOutliersSink,
   createClearCustomLineSink,
   createHTTPSink,
 } from './model';
@@ -39,6 +40,10 @@ export function Sidebar(sources: SidebarSources): SidebarSinks {
     actions.toggleRegression$,
     state$
   );
+  const toggleOutliers$ = createToggleOutliersSink(
+    actions.toggleOutliers$,
+    state$
+  );
   const clearCustomLine$ = createClearCustomLineSink(actions.clearCustomLine$);
   const http$ = createHTTPSink(actions);
 
@@ -48,6 +53,7 @@ export function Sidebar(sources: SidebarSources): SidebarSinks {
     datasetChange: datasetChange$,
     selectedDataset: selectedDataset$,
     toggleRegression: toggleRegression$,
+    toggleOutliers: toggleOutliers$,
     clearCustomLine: clearCustomLine$,
   };
 }

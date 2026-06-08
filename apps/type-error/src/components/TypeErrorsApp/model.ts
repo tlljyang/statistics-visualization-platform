@@ -18,6 +18,8 @@ interface Params {
   stdDev: number;
 }
 
+type TestType = 'left-tailed' | 'right-tailed' | 'two-tailed';
+
 // Reuse computation functions from the old model
 function normalPDF(x: number, mean: number, stdDev: number): number {
   return (1 / (stdDev * Math.sqrt(2 * Math.PI))) * Math.exp(-0.5 * ((x - mean) / stdDev) ** 2);
@@ -68,7 +70,7 @@ function computeCriticalValues(
   alpha: number,
   nullMean: number,
   stdDev: number,
-  testType: 'left-tailed' | 'right-tailed' | 'two-tailed'
+  testType: TestType
 ): number[] {
   const pValues =
     testType === 'right-tailed'
@@ -81,7 +83,7 @@ function computeCriticalValues(
 }
 
 function createCriticalAreaFn(
-  testType: 'left-tailed' | 'right-tailed' | 'two-tailed'
+  testType: TestType
 ): (d: { x: number; y: number }, c: number[]) => boolean {
   return (d: { x: number; y: number }, c: number[]) => {
     if (testType === 'right-tailed') {
@@ -97,7 +99,7 @@ function createCriticalAreaFn(
 
 function createHypothesisText(
   nullMean: number,
-  testType: 'left-tailed' | 'right-tailed' | 'two-tailed'
+  testType: TestType
 ): { H0Text: string; H1Text: string } {
   const H0Text = `H₀: μ = ${nullMean}`;
   const H1Text =
@@ -114,7 +116,7 @@ function computeTypeTwoErrorRate(
   criticalValue: number[],
   trueMean: number,
   stdDev: number,
-  testType: 'left-tailed' | 'right-tailed' | 'two-tailed'
+  testType: TestType
 ): number {
   if (testType === 'right-tailed') {
     return normalCDF(criticalValue[0] ?? 0, trueMean, stdDev);
@@ -146,7 +148,7 @@ export function model(
         stdDev: 1,
       };
 
-      const testType = config.testType as 'left-tailed' | 'right-tailed' | 'two-tailed';
+      const testType = config.testType as TestType;
       const criticalValue = computeCriticalValues(
         params.alpha,
         params.nullMean,
@@ -248,8 +250,51 @@ export function model(
       };
     });
 
+  const testType$ = actions.testType$ as Stream<TestType>;
+  const testTypeReducer$: Stream<Reducer<AppState>> = testType$.map((testType: TestType): Reducer<AppState> => {
+    return (prev: AppState | undefined): AppState => {
+      if (!prev) {
+        throw new Error('State should be initialized before test type updates');
+      }
+
+      const { params } = prev;
+      const criticalValue = computeCriticalValues(
+        params.alpha,
+        params.nullMean,
+        params.stdDev,
+        testType,
+      );
+      const typeTwoErrorRate = computeTypeTwoErrorRate(
+        criticalValue,
+        params.trueMean,
+        params.stdDev,
+        testType,
+      );
+
+      return {
+        ...prev,
+        config: {
+          ...prev.config,
+          testType,
+        },
+        computed: {
+          scales: createScales(prev.config.width, prev.config.height),
+          nullDistribution: generateDistribution(params.nullMean, params.stdDev),
+          trueDistribution: generateDistribution(params.trueMean, params.stdDev),
+          criticalValue,
+          criticalAreaFn: createCriticalAreaFn(testType),
+          hypothesisText: createHypothesisText(params.nullMean, testType),
+          typeOneErrorRate: params.alpha,
+          typeTwoErrorRate,
+          power: 1 - typeTwoErrorRate,
+          effectSize: params.trueMean - params.nullMean,
+        },
+      };
+    };
+  });
+
   // Merge all reducers
-  const reducer$ = xs.merge(defaultReducer$, computedReducer$);
+  const reducer$ = xs.merge(defaultReducer$, computedReducer$, testTypeReducer$);
 
   return { reducer$, state$ };
 }

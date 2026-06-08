@@ -24,7 +24,10 @@ export function view(state$: Stream<State>): Stream<VNode> {
       showRegression,
       hover,
     } = state;
+    const chartWidth = width - margins.left - margins.right;
     const chartHeight = height - margins.top - margins.bottom;
+    const xGridTicks = scales.xScale.ticks(6);
+    const yGridTicks = scales.yScale.ticks(6);
 
     return h('div.regression-chart', [
       svg(
@@ -32,7 +35,12 @@ export function view(state$: Stream<State>): Stream<VNode> {
           attrs: {
             width: String(width),
             height: String(height),
+            viewBox: `0 0 ${width} ${height}`,
+            preserveAspectRatio: 'xMidYMid meet',
             class: 'chart-svg',
+            role: 'img',
+            'data-margin-left': margins.left,
+            'data-margin-top': margins.top,
           },
         },
         [
@@ -44,6 +52,46 @@ export function view(state$: Stream<State>): Stream<VNode> {
               },
             },
             [
+              svg.rect({
+                attrs: {
+                  class: 'plot-background',
+                  x: 0,
+                  y: 0,
+                  width: chartWidth,
+                  height: chartHeight,
+                  rx: 14,
+                },
+              }),
+              svg.g(
+                {
+                  attrs: { class: 'chart-grid chart-grid--x' },
+                },
+                xGridTicks.map((tick) =>
+                  svg.line({
+                    attrs: {
+                      x1: scales.xScale(tick),
+                      y1: 0,
+                      x2: scales.xScale(tick),
+                      y2: chartHeight,
+                    },
+                  })
+                )
+              ),
+              svg.g(
+                {
+                  attrs: { class: 'chart-grid chart-grid--y' },
+                },
+                yGridTicks.map((tick) =>
+                  svg.line({
+                    attrs: {
+                      x1: 0,
+                      y1: scales.yScale(tick),
+                      x2: chartWidth,
+                      y2: scales.yScale(tick),
+                    },
+                  })
+                )
+              ),
               // X Axis
               svg.g(
                 {
@@ -87,6 +135,29 @@ export function view(state$: Stream<State>): Stream<VNode> {
                 customLine.tempPoints,
                 scales,
                 customLine.isDragging
+              ),
+              svg.text(
+                {
+                  attrs: {
+                    class: 'chart-axis-label chart-axis-label--x',
+                    x: chartWidth,
+                    y: chartHeight + 42,
+                    'text-anchor': 'end',
+                  },
+                },
+                'Explanatory variable'
+              ),
+              svg.text(
+                {
+                  attrs: {
+                    class: 'chart-axis-label chart-axis-label--y',
+                    x: -chartHeight / 2,
+                    y: -46,
+                    transform: 'rotate(-90)',
+                    'text-anchor': 'middle',
+                  },
+                },
+                'Response'
               ),
             ]
           ),

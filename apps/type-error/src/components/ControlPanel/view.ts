@@ -42,7 +42,7 @@ export function view(state$: Stream<ParamsState>): Stream<VNode> {
           attrs: {
             type: 'range',
             id: 'null-mean',
-            min: '0',
+            min: '-2',
             max: '2',
             step: '0.1',
             value: String(state.nullMean)

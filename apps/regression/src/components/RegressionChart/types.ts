@@ -28,6 +28,7 @@ export interface Margins {
 export interface Point {
   x: number;
   y: number;
+  outlier?: boolean;
 }
 
 // ==================== Scales ====================
