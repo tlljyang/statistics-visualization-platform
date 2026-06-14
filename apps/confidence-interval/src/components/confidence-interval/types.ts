@@ -2,6 +2,7 @@ import { type ScaleLinear } from "d3";
 import type { Stream } from "xstream";
 import type { DOMSource } from "@cycle/dom";
 import type { VNode } from "@cycle/dom";
+import type { Language } from "../../../../shared/language";
 
 export interface Sample {
   lower: number;
@@ -28,6 +29,7 @@ export interface Config {
 }
 
 export interface State {
+  language: Language;
   sampleSize: number;
   populationSD: number;
   confidenceLevel: number;

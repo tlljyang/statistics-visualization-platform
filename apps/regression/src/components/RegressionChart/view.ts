@@ -1,6 +1,7 @@
 import type { Stream } from 'xstream';
 import { svg, h } from '@cycle/dom';
 import type { VNode } from '@cycle/dom';
+import { localizeText } from '../../../../shared/i18n';
 import type { State } from './types';
 import { createXAxisVNode, createYAxisVNode } from '../../d3/axes';
 import {
@@ -23,6 +24,7 @@ export function view(state$: Stream<State>): Stream<VNode> {
       regression,
       showRegression,
       hover,
+      props,
     } = state;
     const chartWidth = width - margins.left - margins.right;
     const chartHeight = height - margins.top - margins.bottom;
@@ -145,7 +147,7 @@ export function view(state$: Stream<State>): Stream<VNode> {
                     'text-anchor': 'end',
                   },
                 },
-                'Explanatory variable'
+                localizeText(props.xLabel || 'Explanatory variable', props.language)
               ),
               svg.text(
                 {
@@ -157,7 +159,7 @@ export function view(state$: Stream<State>): Stream<VNode> {
                     'text-anchor': 'middle',
                   },
                 },
-                'Response'
+                localizeText(props.yLabel || 'Response', props.language)
               ),
             ]
           ),

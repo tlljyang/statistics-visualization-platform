@@ -33,9 +33,19 @@ export function intent(sources: Sources): Actions {
     .events("click")
     .map(() => Date.now());
 
+  const addSamples$ = dom
+    .select(".sample-quick-button")
+    .events("click")
+    .map((event: Event) => {
+      const target = event.currentTarget as HTMLElement;
+      return Number(target.dataset.sampleDelta ?? 0);
+    })
+    .filter((delta: number) => delta > 0);
+
   return {
     selectExample$,
     updateControl$,
+    addSamples$,
     runSimulation$
   };
 }

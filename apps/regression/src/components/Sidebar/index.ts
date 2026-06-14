@@ -28,7 +28,7 @@ export function Sidebar(sources: SidebarSources): SidebarSinks {
   // MVI Pattern
   const actions = intent(sources);
   const state$ = model(actions);
-  const vdom$ = view(state$);
+  const vdom$ = view(state$, sources.LANGUAGE);
 
   // Create sink streams from actions and state
   const datasetChange$ = createDatasetChangeSink(actions.selectDataset$);

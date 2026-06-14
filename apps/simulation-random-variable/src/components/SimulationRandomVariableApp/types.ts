@@ -1,5 +1,7 @@
 import type { Stream } from "xstream";
 import type { DOMSource, VNode } from "@cycle/dom";
+import type { TemplateCopy } from "../../../../shared/i18n";
+import type { Language } from "../../../../shared/language";
 
 export type ControlValue = number | string;
 export type ControlType = "number" | "select" | "text";
@@ -103,6 +105,8 @@ export interface SimulationResult {
 }
 
 export interface State {
+  language: Language;
+  copy: TemplateCopy;
   config: ModuleConfig;
   activeExample: ExampleConfig;
   controls: Record<string, ControlValue>;
@@ -121,5 +125,6 @@ export interface Sinks {
 export interface Actions {
   selectExample$: Stream<string>;
   updateControl$: Stream<{ id: string; value: ControlValue }>;
+  addSamples$: Stream<number>;
   runSimulation$: Stream<number>;
 }

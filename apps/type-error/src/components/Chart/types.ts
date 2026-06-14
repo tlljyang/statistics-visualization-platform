@@ -1,5 +1,6 @@
 import { Stream } from 'xstream';
 import type { VNode } from '@cycle/dom';
+import type { Language } from '../../../../shared/language';
 
 export interface DistributionPoint {
   x: number;
@@ -19,6 +20,7 @@ export interface HypothesisText {
 }
 
 export interface ChartProps {
+  language: Language;
   scales: Scales;
   nullDistribution: DistributionPoint[];
   trueDistribution: DistributionPoint[];

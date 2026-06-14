@@ -1,6 +1,7 @@
 import { Stream } from 'xstream';
 import type { Reducer, StateSource } from '@cycle/state';
 import type { DOMSource, VNode } from '@cycle/dom';
+import type { Language } from '../../../../shared/language';
 
 export interface ParamsState {
   alpha: number;
@@ -12,6 +13,7 @@ export interface ParamsState {
 export interface Sources {
   DOM: DOMSource;
   state: StateSource<ParamsState>;
+  LANGUAGE: Stream<Language>;
 }
 
 export interface Sinks {

@@ -6,6 +6,7 @@ import {
   visualizers,
   type VisualizerLink
 } from "./visualizers";
+import { PLATFORM_LANGUAGE_KEY, platformCopy, type PlatformLanguage } from "./i18n/platform-copy";
 
 const app = document.querySelector<HTMLMainElement>("#app");
 const PLATFORM_SIDEBAR_WIDTH_KEY = "statistics-platform-sidebar-width";
@@ -13,6 +14,7 @@ const MODULE_TEACHING_WIDTH_KEY = "statistics-module-teaching-width";
 let platformShell: HTMLElement | null = null;
 let visualizerFrame: HTMLIFrameElement | null = null;
 let activeTitleElement: HTMLElement | null = null;
+let platformLanguage: PlatformLanguage = getInitialLanguage();
 
 if (!app) {
   throw new Error("Missing #app mount point.");
@@ -34,6 +36,62 @@ function setHashId(id: string): void {
   }
 }
 
+function getInitialLanguage(): PlatformLanguage {
+  try {
+    return window.localStorage.getItem(PLATFORM_LANGUAGE_KEY) === "en" ? "en" : "zh";
+  } catch {
+    return "zh";
+  }
+}
+
+function getVisualizerCopy(visualizer: VisualizerLink): [string, string] {
+  return platformCopy[platformLanguage].visualizers[visualizer.id] ?? [
+    visualizer.label,
+    visualizer.pageTitle
+  ];
+}
+
+function getVisualizerPageTitle(visualizer: VisualizerLink): string {
+  return getVisualizerCopy(visualizer)[1];
+}
+
+function setPlatformLanguage(language: PlatformLanguage): void {
+  platformLanguage = language;
+
+  try {
+    window.localStorage.setItem(PLATFORM_LANGUAGE_KEY, language);
+  } catch {
+    // localStorage can be unavailable in embedded browser contexts.
+  }
+
+  syncActiveVisualizer(getVisualizerById(getHashId()));
+}
+
+function createLanguageTabs(): HTMLElement {
+  const tabs = document.createElement("div");
+  tabs.className = "platform-language-tabs";
+  tabs.setAttribute("role", "tablist");
+  tabs.setAttribute("aria-label", "Language");
+
+  for (const [language, label] of [
+    ["zh", "中文"],
+    ["en", "English"]
+  ] as const) {
+    const button = document.createElement("button");
+    button.className = "platform-language-tab";
+    button.type = "button";
+    button.dataset.language = language;
+    button.dataset.active = String(platformLanguage === language);
+    button.setAttribute("role", "tab");
+    button.setAttribute("aria-selected", String(platformLanguage === language));
+    button.textContent = label;
+    button.addEventListener("click", () => setPlatformLanguage(language));
+    tabs.append(button);
+  }
+
+  return tabs;
+}
+
 function createNavButton(visualizer: VisualizerLink, isActive: boolean): HTMLButtonElement {
   const button = document.createElement("button");
   button.className = "visualizer-nav__button";
@@ -45,11 +103,11 @@ function createNavButton(visualizer: VisualizerLink, isActive: boolean): HTMLBut
 
   const label = document.createElement("span");
   label.className = "visualizer-nav__label";
-  label.textContent = visualizer.label;
+  label.textContent = getVisualizerCopy(visualizer)[0];
 
   const detail = document.createElement("span");
   detail.className = "visualizer-nav__detail";
-  detail.textContent = visualizer.pageTitle;
+  detail.textContent = getVisualizerCopy(visualizer)[1];
 
   const icon = document.createElement("span");
   icon.className = "visualizer-nav__icon";
@@ -82,9 +140,7 @@ function iconForVisualizer(id: string): string {
 }
 
 function displayGroupName(groupName: VisualizerLink["group"]): string {
-  if (groupName === "Core Visualizers") return "Core Visualizers";
-  if (groupName === "WALS Simulation") return "Simulation";
-  return "Methods";
+  return platformCopy[platformLanguage].groups[groupName];
 }
 
 function createNavGroup(
@@ -93,6 +149,7 @@ function createNavGroup(
 ): HTMLElement {
   const group = document.createElement("section");
   group.className = "visualizer-nav__group";
+  group.dataset.groupName = groupName;
 
   const heading = document.createElement("h2");
   heading.className = "visualizer-nav__group-title";
@@ -111,18 +168,56 @@ function createNavGroup(
 }
 
 function syncActiveVisualizer(activeVisualizer: VisualizerLink): void {
-  document.title = `${activeVisualizer.pageTitle} | 统计学习可视化平台`;
+  const copy = platformCopy[platformLanguage];
+  const activePageTitle = getVisualizerPageTitle(activeVisualizer);
+
+  document.documentElement.lang = platformLanguage === "zh" ? "zh-CN" : "en";
+  document.title = `${activePageTitle} | ${copy.documentSuffix}`;
+
+  document.querySelectorAll<HTMLButtonElement>(".platform-language-tab").forEach((button) => {
+    const isActive = button.dataset.language === platformLanguage;
+
+    button.dataset.active = String(isActive);
+    button.setAttribute("aria-selected", String(isActive));
+  });
+
+  const brandTitle = document.querySelector<HTMLElement>(".platform-sidebar__title");
+  const brandSubtitle = document.querySelector<HTMLElement>(".platform-sidebar__subtitle");
+  const nav = document.querySelector<HTMLElement>(".visualizer-nav");
+  const tipTitle = document.querySelector<HTMLElement>(".platform-sidebar__tip strong");
+  const tipBody = document.querySelector<HTMLElement>(".platform-sidebar__tip span");
+
+  if (brandTitle) brandTitle.textContent = copy.brandTitle;
+  if (brandSubtitle) brandSubtitle.textContent = copy.brandSubtitle;
+  if (nav) nav.setAttribute("aria-label", copy.navLabel);
+  if (tipTitle) tipTitle.textContent = copy.tipTitle;
+  if (tipBody) tipBody.textContent = copy.tipBody;
+
+  document.querySelectorAll<HTMLElement>(".visualizer-nav__group").forEach((group) => {
+    const groupName = group.dataset.groupName as VisualizerLink["group"] | undefined;
+    const heading = group.querySelector<HTMLElement>(".visualizer-nav__group-title");
+
+    if (groupName && heading) {
+      heading.textContent = displayGroupName(groupName);
+    }
+  });
 
   if (activeTitleElement) {
-    activeTitleElement.textContent = activeVisualizer.pageTitle;
+    activeTitleElement.textContent = activePageTitle;
   }
 
   document.querySelectorAll<HTMLButtonElement>(".visualizer-nav__button").forEach((button) => {
     const isActive = button.dataset.visualizerId === activeVisualizer.id;
     const marker = button.querySelector<HTMLElement>(".visualizer-nav__marker");
+    const label = button.querySelector<HTMLElement>(".visualizer-nav__label");
+    const detail = button.querySelector<HTMLElement>(".visualizer-nav__detail");
+    const visualizer = getVisualizerById(button.dataset.visualizerId ?? null);
+    const [translatedLabel, translatedDetail] = getVisualizerCopy(visualizer);
 
     button.dataset.active = String(isActive);
     button.setAttribute("aria-pressed", String(isActive));
+    if (label) label.textContent = translatedLabel;
+    if (detail) detail.textContent = translatedDetail;
 
     if (marker) {
       marker.textContent = isActive ? "✦" : "";
@@ -132,12 +227,31 @@ function syncActiveVisualizer(activeVisualizer: VisualizerLink): void {
   if (visualizerFrame) {
     const nextSrc = resolveVisualizerPath(import.meta.env.BASE_URL, activeVisualizer.path);
 
-    visualizerFrame.title = activeVisualizer.pageTitle;
+    visualizerFrame.title = activePageTitle;
 
     if (visualizerFrame.getAttribute("src") !== nextSrc) {
       visualizerFrame.dataset.loading = "true";
       visualizerFrame.src = nextSrc;
+    } else {
+      syncFrameLanguage(visualizerFrame);
     }
+  }
+}
+
+function syncFrameLanguage(frame: HTMLIFrameElement): void {
+  try {
+    frame.contentWindow?.postMessage(
+      { type: "statistics-platform-language", language: platformLanguage },
+      window.location.origin
+    );
+
+    if (frame.contentDocument?.documentElement) {
+      frame.contentDocument.documentElement.lang =
+        platformLanguage === "zh" ? "zh-CN" : "en";
+    }
+
+  } catch {
+    // The frame can be temporarily unavailable while loading.
   }
 }
 
@@ -366,6 +480,7 @@ function render(): void {
 
   const shell = document.createElement("section");
   shell.className = "platform-shell";
+  shell.append(createLanguageTabs());
 
   const sidebar = document.createElement("aside");
   sidebar.className = "platform-sidebar";
@@ -418,6 +533,7 @@ function render(): void {
   frame.className = "visualizer-frame";
   frame.addEventListener("load", () => {
     frame.dataset.loading = "false";
+    syncFrameLanguage(frame);
     injectModuleResize(frame);
   });
   visualizerFrame = frame;

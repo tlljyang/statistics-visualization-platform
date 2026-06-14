@@ -116,6 +116,7 @@ export function model(actions: Actions): Stream<State> {
   const initialState: State = {
     // basic config (will be replaced by config$)
     props: {
+      language: 'zh',
       width: 0,
       height: 0,
       datasets: [],

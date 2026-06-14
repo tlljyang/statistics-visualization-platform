@@ -1,5 +1,6 @@
 import type { Stream } from 'xstream';
 import type { DOMSource, VNode } from '@cycle/dom';
+import type { Language } from '../../../../shared/language';
 
 // Re-export Point type from RegressionChart for convenience
 export interface Point {
@@ -19,6 +20,7 @@ export interface StatisticsPanelSources {
   customLine: Stream<CustomLineData>;
   regression: Stream<RegressionData>;
   pointHover: Stream<PointHoverData>;
+  LANGUAGE: Stream<Language>;
 }
 
 // ==================== Sink Data Types (from RegressionChart) ====================

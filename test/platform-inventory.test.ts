@@ -23,6 +23,7 @@ describe("platform integration inventory", () => {
       regression: "regression-visualization",
       "simulation-introduction": "simulation-introduction-visualization",
       "simulation-random-variable": "simulation-random-variable-visualization",
+      "simulation-clt": "simulation-clt-visualization",
       "simulation-variance-reduction":
         "simulation-variance-reduction-visualization",
       "simulation-resampling": "simulation-resampling-visualization",

@@ -1,0 +1,127 @@
+import { describe, expect, it } from "vitest";
+import { createState as createAnovaState } from "../apps/mes-anova/src/components/MesAnovaApp/model";
+import { createState as createMesConfidenceState } from "../apps/mes-confidence-interval/src/components/MesConfidenceIntervalApp/model";
+import { createState as createDistributionsState } from "../apps/mes-distributions/src/components/MesDistributionsApp/model";
+import { createState as createMesRegressionState } from "../apps/mes-linear-regression/src/components/MesLinearRegressionApp/model";
+import { createState as createCltState } from "../apps/simulation-clt/src/components/SimulationCltApp/model";
+import { createState as createIntroductionState } from "../apps/simulation-introduction/src/components/SimulationIntroductionApp/model";
+import { createState as createMcmcState } from "../apps/simulation-mcmc/src/components/SimulationMcmcApp/model";
+import { createState as createRandomVariableState } from "../apps/simulation-random-variable/src/components/SimulationRandomVariableApp/model";
+import { createState as createResamplingState } from "../apps/simulation-resampling/src/components/SimulationResamplingApp/model";
+import { createState as createVarianceReductionState } from "../apps/simulation-variance-reduction/src/components/SimulationVarianceReductionApp/model";
+
+const allowedLatinWords = new Set([
+  "ANOVA",
+  "CDF",
+  "CMF",
+  "GDP",
+  "Gamma",
+  "MCMC",
+  "MES",
+  "PDF",
+  "PMF",
+  "Phi",
+  "SSE",
+  "WALS",
+  "exp",
+  "int",
+  "sigma",
+  "sqrt"
+]);
+
+function collectStrings(value: unknown, strings: string[] = []): string[] {
+  if (typeof value === "string") {
+    strings.push(value);
+    return strings;
+  }
+
+  if (Array.isArray(value)) {
+    value.forEach((entry) => collectStrings(entry, strings));
+    return strings;
+  }
+
+  if (value && typeof value === "object") {
+    Object.values(value).forEach((entry) => collectStrings(entry, strings));
+  }
+
+  return strings;
+}
+
+function collectVisibleStateStrings(state: any): string[] {
+  const strings: string[] = [];
+
+  collectStrings(
+    {
+      category: state.config.category,
+      title: state.config.title,
+      subtitle: state.config.subtitle,
+      examples: state.config.examples.map((example: any) => ({
+        title: example.title,
+        description: example.description,
+        teachingPoints: example.teachingPoints,
+        controls: example.controls.map((control: any) => ({
+          label: control.label,
+          options: control.options?.map((option: any) => option.label)
+        }))
+      })),
+      activeExample: {
+        title: state.activeExample.title,
+        description: state.activeExample.description,
+        teachingPoints: state.activeExample.teachingPoints,
+        controls: state.activeExample.controls.map((control: any) => ({
+          label: control.label,
+          options: control.options?.map((option: any) => option.label)
+        }))
+      },
+      result: {
+        headline: state.result.headline,
+        narrative: state.result.narrative,
+        metrics: state.result.metrics,
+        chart: {
+          title: state.result.chart.title,
+          xLabel: state.result.chart.xLabel,
+          yLabel: state.result.chart.yLabel,
+          populationTitle: state.result.chart.populationTitle,
+          samplingTitle: state.result.chart.samplingTitle,
+          bars: state.result.chart.bars?.map((bar: any) => bar.label),
+          populationBars: state.result.chart.populationBars?.map((bar: any) => bar.label),
+          sampleMeanBars: state.result.chart.sampleMeanBars?.map((bar: any) => bar.label),
+          intervals: state.result.chart.intervals?.map((interval: any) => interval.label),
+          series: state.result.chart.series?.map((series: any) => series.label),
+          points: state.result.chart.points?.map((point: any) => point.label),
+          line: state.result.chart.line?.label
+        },
+        tableColumns: state.result.table?.columns
+      }
+    },
+    strings
+  );
+
+  return strings;
+}
+
+function unexpectedLatin(text: string): boolean {
+  const matches = text.match(/\b[A-Za-z]{3,}\b/g) ?? [];
+  return matches.some((word) => !allowedLatinWords.has(word));
+}
+
+describe("template modules Chinese completeness", () => {
+  it("does not leave visible template module copy in English", () => {
+    const states = [
+      createIntroductionState(undefined, undefined, 510, "zh"),
+      createRandomVariableState(undefined, undefined, 510, "zh"),
+      createCltState(undefined, undefined, 510, [], "zh"),
+      createVarianceReductionState(undefined, undefined, 510, "zh"),
+      createResamplingState(undefined, undefined, 510, "zh"),
+      createMcmcState(undefined, undefined, 510, "zh"),
+      createAnovaState(undefined, undefined, 510, "zh"),
+      createMesConfidenceState(undefined, undefined, 510, "zh"),
+      createDistributionsState(undefined, undefined, 510, "zh"),
+      createMesRegressionState(undefined, undefined, 510, "zh")
+    ];
+
+    const leftovers = [...new Set(states.flatMap((state) => collectVisibleStateStrings(state)).filter(unexpectedLatin))];
+
+    expect(leftovers).toEqual([]);
+  });
+});

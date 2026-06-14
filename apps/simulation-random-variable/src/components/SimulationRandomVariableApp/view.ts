@@ -1,6 +1,7 @@
 import { h } from "@cycle/dom";
 import type { VNode } from "@cycle/dom";
 import type { Stream } from "xstream";
+import { localizeText } from "../../../../shared/i18n";
 import { chartToVNode } from "../../d3/charts";
 import type { ControlConfig, ControlValue, State } from "./types";
 
@@ -43,8 +44,7 @@ function renderControl(control: ControlConfig, controls: Record<string, ControlV
 
   const inputAttrs: Record<string, string | number | boolean> = {
     "data-control-id": control.id,
-    type: control.type,
-    value: String(value)
+    type: control.type
   };
 
   if (control.min !== undefined) inputAttrs.min = control.min;
@@ -53,7 +53,12 @@ function renderControl(control: ControlConfig, controls: Record<string, ControlV
 
   return h("label.control-field", [
     h("span.control-label", control.label),
-    h("input.control-input", { attrs: inputAttrs }, [])
+    h("input.control-input", {
+      attrs: inputAttrs,
+      props: {
+        value: String(value)
+      }
+    }, [])
   ]);
 }
 
@@ -63,7 +68,7 @@ function renderTable(state: State): VNode | null {
   }
 
   return h("section.teaching-panel.table-panel", [
-    h("h3", "Data table"),
+    h("h3", state.copy.dataTable),
     h("div.table-scroll", [
       h("table.result-table", [
         h("thead", [
@@ -144,9 +149,9 @@ function renderFormula(state: State): VNode {
   }
 
   return h("div.math-expression", [
-    h("span", "simulation result"),
+    h("span", localizeText("simulation result", state.language)),
     h("span.math-symbol", "="),
-    h("span", "f(parameters, random seed)")
+    h("span", localizeText("f(parameters, random seed)", state.language))
   ]);
 }
 
@@ -164,7 +169,7 @@ export function view(state$: Stream<State>): Stream<VNode> {
           ]),
           h("section.output-dock", [
             h("div.output-heading", [
-              h("p.eyebrow", "Model output"),
+              h("p.eyebrow", state.copy.modelOutput),
               h("h2", state.result.headline),
               h("p", state.result.narrative)
             ]),
@@ -174,7 +179,7 @@ export function view(state$: Stream<State>): Stream<VNode> {
         ]),
         h("aside.teaching-area", [
           h("section.teaching-panel.parameter-panel", [
-            h("p.eyebrow", "Parameters"),
+            h("p.eyebrow", state.copy.parameters),
             h("div.example-tabs", state.config.examples.map((example) =>
               h("button.example-tab", {
                 attrs: {
@@ -185,21 +190,35 @@ export function view(state$: Stream<State>): Stream<VNode> {
               }, [example.title])
             )),
             h("div.control-grid", state.activeExample.controls.map((control) => renderControl(control, state.controls))),
-            h("button.run-button", { attrs: { type: "button" } }, ["Run"])
+            h("div.sample-quick-actions", [
+              h("button.sample-quick-button", {
+                attrs: {
+                  type: "button",
+                  "data-sample-delta": "1"
+                }
+              }, [state.copy.addOneSample]),
+              h("button.sample-quick-button", {
+                attrs: {
+                  type: "button",
+                  "data-sample-delta": "20"
+                }
+              }, [state.copy.addTwentySamples])
+            ]),
+            h("button.run-button", { attrs: { type: "button" } }, [state.copy.run])
           ]),
           h("section.teaching-panel", [
-            h("p.eyebrow", "Concept + key idea"),
+            h("p.eyebrow", state.copy.conceptKeyIdea),
             h("h2", state.activeExample.title),
             h("p", state.activeExample.description),
             renderTeachingPoints(state)
           ]),
           h("section.teaching-panel.formula-panel", [
-            h("p.eyebrow", "Formula"),
+            h("p.eyebrow", state.copy.formula),
             h("div.latex-formula", [renderFormula(state)]),
-            h("p", "Use the formula as the anchor, then connect each symbol back to the controls and chart.")
+            h("p", state.copy.formulaHelper)
           ]),
           h("section.teaching-panel", [
-            h("p.eyebrow", "How to read this"),
+            h("p.eyebrow", state.copy.howToReadThis),
             h("h3", state.result.headline),
             h("p", state.result.narrative)
           ]),

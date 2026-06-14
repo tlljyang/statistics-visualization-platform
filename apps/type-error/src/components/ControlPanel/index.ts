@@ -7,7 +7,7 @@ export default function ControlPanel(sources: Sources): Sinks {
   const actions = intent(sources);
   const { reducer$ } = model(actions);
   const state$ = sources.state.stream;
-  const vdom$ = view(state$);
+  const vdom$ = view(state$, sources.LANGUAGE);
 
   return {
     DOM: vdom$,

@@ -1142,6 +1142,59 @@ body {
   background: var(--sage-soft);
 }
 
+.chart-inline-legend {
+  pointer-events: none;
+}
+
+.chart-inline-legend__panel {
+  fill: rgba(255, 253, 248, 0.9);
+  stroke: rgba(90, 80, 60, 0.16);
+  stroke-width: 1;
+}
+
+.chart-inline-legend__title {
+  fill: var(--text-secondary);
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.chart-inline-legend__label {
+  fill: var(--text-primary);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.chart-inline-legend__line {
+  fill: none;
+  stroke-linecap: round;
+  stroke-width: 2.4;
+}
+
+.chart-inline-legend__line--null {
+  stroke: var(--chart-blue);
+}
+
+.chart-inline-legend__line--true {
+  stroke: var(--teal);
+}
+
+.chart-inline-legend__line--critical {
+  stroke: var(--text-primary);
+  stroke-dasharray: 4 4;
+}
+
+.chart-inline-legend__area--type1 {
+  fill: var(--lavender);
+  opacity: 0.3;
+}
+
+.chart-inline-legend__area--type2 {
+  fill: var(--danger);
+  opacity: 0.3;
+}
+
 @media (max-width: 1100px) {
   body {
     overflow: auto;

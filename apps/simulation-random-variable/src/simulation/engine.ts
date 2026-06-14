@@ -137,7 +137,7 @@ function buffon(controls: ControlMap, seed: number): SimulationResult {
 
 function randomNormal(controls: ControlMap, seed: number): SimulationResult {
   const rng = createRandom(seed);
-  const n = Math.max(100, Math.round(num(controls, "sampleSize", 1000)));
+  const n = Math.max(1, Math.round(num(controls, "sampleSize", 1000)));
   const targetMean = num(controls, "mean", 0);
   const sd = Math.max(0.1, num(controls, "sd", 1));
   const sample = Array.from({ length: n }, () => normalRandom(rng, targetMean, sd));
@@ -155,7 +155,7 @@ function randomNormal(controls: ControlMap, seed: number): SimulationResult {
 
 function randomExponential(controls: ControlMap, seed: number): SimulationResult {
   const rng = createRandom(seed);
-  const n = Math.max(100, Math.round(num(controls, "sampleSize", 1000)));
+  const n = Math.max(1, Math.round(num(controls, "sampleSize", 1000)));
   const lambda = Math.max(0.1, num(controls, "lambda", 2));
   const sample = Array.from({ length: n }, () => exponentialRandom(rng, lambda));
   return result(
@@ -172,7 +172,7 @@ function randomExponential(controls: ControlMap, seed: number): SimulationResult
 
 function gammaRejection(controls: ControlMap, seed: number): SimulationResult {
   const rng = createRandom(seed);
-  const n = Math.max(100, Math.round(num(controls, "sampleSize", 1500)));
+  const n = Math.max(1, Math.round(num(controls, "sampleSize", 1500)));
   const alpha = Math.max(0.2, num(controls, "alpha", 1.5));
   const beta = Math.max(0.2, num(controls, "beta", 1));
   const lambda = Math.max(0.1, num(controls, "lambda", 0.6667));

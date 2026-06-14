@@ -7,6 +7,73 @@ import type {
 } from './types';
 import type { RequestOptions } from '@cycle/http';
 
+type DataPoint = Dataset['data'][number];
+
+function mean(values: number[]): number {
+  return values.reduce((sum, value) => sum + value, 0) / values.length;
+}
+
+function annotateDatasetOutliers(dataset: Dataset): Dataset {
+  if (dataset.data.some((point) => point.outlier)) {
+    return dataset;
+  }
+
+  if (dataset.data.length < 8) {
+    return dataset;
+  }
+
+  const xValues = dataset.data.map((point) => point.x);
+  const yValues = dataset.data.map((point) => point.y);
+  const xMean = mean(xValues);
+  const yMean = mean(yValues);
+  const sxx = xValues.reduce((sum, x) => sum + (x - xMean) ** 2, 0);
+
+  if (sxx <= Number.EPSILON) {
+    return dataset;
+  }
+
+  const sxy = dataset.data.reduce(
+    (sum, point) => sum + (point.x - xMean) * (point.y - yMean),
+    0
+  );
+  const slope = sxy / sxx;
+  const intercept = yMean - slope * xMean;
+  const residuals = dataset.data.map(
+    (point) => point.y - (intercept + slope * point.x)
+  );
+  const mse =
+    residuals.reduce((sum, residual) => sum + residual ** 2, 0) /
+    Math.max(dataset.data.length - 2, 1);
+
+  if (!Number.isFinite(mse) || mse <= Number.EPSILON) {
+    return dataset;
+  }
+
+  const rmse = Math.sqrt(mse);
+  const influenceCutoff = 4 / dataset.data.length;
+  const annotatedData = dataset.data.map((point, index): DataPoint => {
+    const leverage =
+      1 / dataset.data.length + ((point.x - xMean) ** 2) / sxx;
+    const leverageSafe = Math.min(0.999999, leverage);
+    const studentizedResidual =
+      Math.abs(residuals[index]) /
+      (rmse * Math.sqrt(Math.max(1 - leverageSafe, 1e-9)));
+    const cooksDistance =
+      (residuals[index] ** 2 / (2 * mse)) *
+      (leverageSafe / Math.max((1 - leverageSafe) ** 2, 1e-9));
+    const isOutlier =
+      studentizedResidual >= 2.5 ||
+      (studentizedResidual >= 2 && cooksDistance > influenceCutoff);
+
+    return isOutlier ? { ...point, outlier: true } : point;
+  });
+
+  return {
+    ...dataset,
+    data: annotatedData
+  };
+}
+
 export function model(actions: SidebarActions): Stream<SidebarState> {
   // Config stream: initial state setup (only runs once per config emission)
   const configState$ = actions.config$.map(
@@ -28,7 +95,7 @@ export function model(actions: SidebarActions): Stream<SidebarState> {
   const datasetsLoadedPatch$ = actions.datasetsLoaded$.map(
     (datasets: Dataset[]) => (state: SidebarState) => ({
       ...state,
-      datasets,
+      datasets: datasets.map(annotateDatasetOutliers),
       selectedDataset:
         datasets.length > 0 ? datasets[0].id : state.selectedDataset,
     })

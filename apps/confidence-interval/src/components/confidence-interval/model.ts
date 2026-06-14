@@ -1,10 +1,11 @@
 import xs, { type Stream } from "xstream";
 import dropRepeats from "xstream/extra/dropRepeats";
 import * as d3 from "d3";
+import type { Language } from "../../../../shared/language";
 import { createScales } from "../../utils/d3-utils";
 import type { Actions, Sample, Scales, Config, State } from "./types";
 
-function createInitialState(): State {
+function createInitialState(language: Language = "zh"): State {
   const config: Config = {
     width: 760,
     height: 360,
@@ -20,6 +21,7 @@ function createInitialState(): State {
   );
 
   return {
+    language,
     sampleSize: 10,
     populationSD: 2,
     confidenceLevel: 0.95,
@@ -86,7 +88,10 @@ export function calculateCoverage(samples: Sample[]): number {
 }
 
 // Model function using @cycle/state pattern
-export default function model(actions: Actions): Stream<(prevState: State | undefined) => State> {
+export default function model(
+  actions: Actions,
+  language$: Stream<Language> = xs.of<Language>("zh")
+): Stream<(prevState: State | undefined) => State> {
   const {
     sampleSize$,
     populationSD$,
@@ -104,6 +109,14 @@ export default function model(actions: Actions): Stream<(prevState: State | unde
     }
     return createInitialState();
   });
+
+  const languageReducer$ = language$.map(
+    (language) =>
+      (prevState: State | undefined): State => ({
+        ...(prevState ?? createInitialState(language)),
+        language,
+      }),
+  );
 
   // Reducer for adding samples
   const addSampleReducer$ = xs
@@ -249,6 +262,7 @@ export default function model(actions: Actions): Stream<(prevState: State | unde
   // Merge all reducers
   return xs.merge(
     defaultReducer$,
+    languageReducer$,
     addSampleReducer$,
     updateSampleSizeReducer$,
     updatePopulationSDReducer$,

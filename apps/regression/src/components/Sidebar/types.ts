@@ -2,6 +2,7 @@ import { Stream } from 'xstream';
 import type { DOMSource } from '@cycle/dom';
 import type { HTTPSource, RequestOptions } from '@cycle/http';
 import type { VNode } from '@cycle/dom';
+import type { Language } from '../../../../shared/language';
 
 export interface Dataset {
   id: string;
@@ -20,6 +21,7 @@ export interface SidebarSources {
   DOM: DOMSource;
   HTTP: HTTPSource;
   props: Stream<SidebarProps>;
+  LANGUAGE: Stream<Language>;
 }
 
 export interface SidebarSinks {

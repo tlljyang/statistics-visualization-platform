@@ -1,6 +1,7 @@
 import { h } from "@cycle/dom";
 import type { VNode } from "@cycle/dom";
 import type { Stream } from "xstream";
+import { localizeText } from "../../../../shared/i18n";
 import { chartToVNode } from "../../d3/charts";
 import type { ControlConfig, ControlValue, State } from "./types";
 
@@ -63,7 +64,7 @@ function renderTable(state: State): VNode | null {
   }
 
   return h("section.teaching-panel.table-panel", [
-    h("h3", "Data table"),
+    h("h3", state.copy.dataTable),
     h("div.table-scroll", [
       h("table.result-table", [
         h("thead", [
@@ -95,9 +96,9 @@ function renderMetricCards(state: State): VNode[] {
 }
 
 function renderFormula(state: State): VNode {
-  const title = state.config.title.toLowerCase();
+  const moduleId = state.config.id.toLowerCase();
 
-  if (title.includes("anova")) {
+  if (moduleId.includes("anova")) {
     return h("div.math-expression", [
       h("span", "F ="),
       h("span.math-frac", [
@@ -107,7 +108,7 @@ function renderFormula(state: State): VNode {
     ]);
   }
 
-  if (title.includes("regression")) {
+  if (moduleId.includes("regression")) {
     return h("div.math-expression", [
       h("span", "SSE ="),
       h("span.math-symbol", "Σ"),
@@ -116,17 +117,17 @@ function renderFormula(state: State): VNode {
     ]);
   }
 
-  if (title.includes("confidence")) {
+  if (moduleId.includes("confidence")) {
     return h("div.math-expression", [
-      h("span", "estimate"),
+      h("span", localizeText("estimate", state.language)),
       h("span.math-symbol", "±"),
-      h("span", "critical value"),
+      h("span", localizeText("critical value", state.language)),
       h("span.math-symbol", "×"),
       h("span", "SE")
     ]);
   }
 
-  if (title.includes("distribution")) {
+  if (moduleId.includes("distribution")) {
     return h("div.math-expression", [
       h("span", "P(a ≤ X ≤ b) ="),
       h("span.math-symbol", "∫"),
@@ -135,7 +136,7 @@ function renderFormula(state: State): VNode {
     ]);
   }
 
-  if (title.includes("mcmc")) {
+  if (moduleId.includes("mcmc")) {
     return h("div.math-expression", [
       h("span", "p(θ | y)"),
       h("span.math-symbol", "∝"),
@@ -144,9 +145,9 @@ function renderFormula(state: State): VNode {
   }
 
   return h("div.math-expression", [
-    h("span", "simulation result"),
+    h("span", localizeText("simulation result", state.language)),
     h("span.math-symbol", "="),
-    h("span", "f(parameters, random seed)")
+    h("span", localizeText("f(parameters, random seed)", state.language))
   ]);
 }
 
@@ -164,7 +165,7 @@ export function view(state$: Stream<State>): Stream<VNode> {
           ]),
           h("section.output-dock", [
             h("div.output-heading", [
-              h("p.eyebrow", "Model output"),
+              h("p.eyebrow", state.copy.modelOutput),
               h("h2", state.result.headline),
               h("p", state.result.narrative)
             ]),
@@ -174,7 +175,7 @@ export function view(state$: Stream<State>): Stream<VNode> {
         ]),
         h("aside.teaching-area", [
           h("section.teaching-panel.parameter-panel", [
-            h("p.eyebrow", "Parameters"),
+            h("p.eyebrow", state.copy.parameters),
             h("div.example-tabs", state.config.examples.map((example) =>
               h("button.example-tab", {
                 attrs: {
@@ -185,21 +186,21 @@ export function view(state$: Stream<State>): Stream<VNode> {
               }, [example.title])
             )),
             h("div.control-grid", state.activeExample.controls.map((control) => renderControl(control, state.controls))),
-            h("button.run-button", { attrs: { type: "button" } }, ["Run"])
+            h("button.run-button", { attrs: { type: "button" } }, [state.copy.run])
           ]),
           h("section.teaching-panel", [
-            h("p.eyebrow", "Concept + key idea"),
+            h("p.eyebrow", state.copy.conceptKeyIdea),
             h("h2", state.activeExample.title),
             h("p", state.activeExample.description),
             renderTeachingPoints(state)
           ]),
           h("section.teaching-panel.formula-panel", [
-            h("p.eyebrow", "Formula"),
+            h("p.eyebrow", state.copy.formula),
             h("div.latex-formula", [renderFormula(state)]),
-            h("p", "Use the formula as the anchor, then connect each symbol back to the controls and chart.")
+            h("p", state.copy.formulaHelper)
           ]),
           h("section.teaching-panel", [
-            h("p.eyebrow", "How to read this"),
+            h("p.eyebrow", state.copy.howToReadThis),
             h("h3", state.result.headline),
             h("p", state.result.narrative)
           ]),

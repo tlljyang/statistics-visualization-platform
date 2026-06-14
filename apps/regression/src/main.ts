@@ -5,6 +5,8 @@ import xs, { Stream } from 'xstream';
 import { h } from '@cycle/dom';
 
 import './styles/custom.css';
+import { localizeText } from '../../shared/i18n';
+import { languageStream, type Language } from '../../shared/language';
 import { getRegressionDataBaseUrl } from './dataBaseUrl';
 import { Sidebar } from './components/Sidebar';
 import { RegressionChart } from './components/RegressionChart';
@@ -34,6 +36,8 @@ function main(sources: MainSources): MainSinks {
     import.meta.env.BASE_URL,
     import.meta.env.DEV
   );
+  const language$ = languageStream();
+  const t = (text: string, language: Language): string => localizeText(text, language);
 
   // ==================== Sidebar Component ====================
   const sidebarProps$ = xs.of({
@@ -67,6 +71,7 @@ function main(sources: MainSources): MainSinks {
     DOM: sources.DOM,
     HTTP: sources.HTTP,
     props: sidebarProps$,
+    LANGUAGE: language$,
   });
 
   // ==================== RegressionChart Component ====================
@@ -78,8 +83,8 @@ function main(sources: MainSources): MainSinks {
 
   // Combine Sidebar sinks to create RegressionChart props
   const chartProps$ = xs
-    .combine(sidebarSinks.selectedDataset, sidebarSinks.toggleRegression, sidebarSinks.toggleOutliers)
-    .map(([dataset, showRegression, showOutliers]): RegressionChartProps => {
+    .combine(sidebarSinks.selectedDataset, sidebarSinks.toggleRegression, sidebarSinks.toggleOutliers, language$)
+    .map(([dataset, showRegression, showOutliers, language]): RegressionChartProps => {
       // Calculate xDomain and yDomain from dataset
       const data = showOutliers ? dataset.data : dataset.data.filter((point) => !point.outlier);
       let xMin = 0,
@@ -105,10 +110,13 @@ function main(sources: MainSources): MainSinks {
       }
 
       return {
+        language,
         width: 860,
         height: 520,
         margins: { top: 34, right: 34, bottom: 58, left: 64 },
         datasets: data,
+        xLabel: dataset.xLabel,
+        yLabel: dataset.yLabel,
         xDomain: [xMin, xMax],
         yDomain: [yMin, yMax],
         showRegression: showRegression,
@@ -135,6 +143,7 @@ function main(sources: MainSources): MainSinks {
     customLine: chartSinks.customLine,
     regression: chartSinks.regression,
     pointHover: chartSinks.pointHover,
+    LANGUAGE: language$,
   });
 
   // ==================== Render ====================
@@ -142,29 +151,30 @@ function main(sources: MainSources): MainSinks {
     .combine(
       sidebarSinks.DOM,
       chartSinks.DOM,
-      statisticsPanelSinks.DOM
+      statisticsPanelSinks.DOM,
+      language$
     )
-    .map(([sidebar, chart, panel]) =>
+    .map(([sidebar, chart, panel, language]) =>
       h('div.module-shell', {}, [
         h('main.module-layout', {}, [
           h('section.experiment-board', {}, [
             h('header.experiment-header', {}, [
               h('div', {}, [
-                h('p.eyebrow', 'Core Visualizer'),
-                h('h1', 'Regression'),
+                h('p.eyebrow', t('Core Visualizer', language)),
+                h('h1', t('Regression', language)),
                 h(
                   'p',
-                  'Choose a dataset, draw a custom line, and compare it with the least-squares regression fit.'
+                  t('Choose a dataset, draw a custom line, and compare it with the least-squares regression fit.', language)
                 ),
               ]),
             ]),
             h('section.output-dock', {}, [
               h('div.output-heading', {}, [
-                h('p.eyebrow', 'Model output'),
-                h('h2', 'Scatterplot and fitted lines'),
+                h('p.eyebrow', t('Model output', language)),
+                h('h2', t('Scatterplot and fitted lines', language)),
                 h(
                   'p',
-                  'Click and drag on the graph to draw a custom line, then compare it with the regression line.'
+                  t('Click and drag on the graph to draw a custom line, then compare it with the regression line.', language)
                 ),
               ]),
               h('div.chart-frame', {}, [h('div.chart-shell', {}, [chart])]),
@@ -173,24 +183,24 @@ function main(sources: MainSources): MainSinks {
           ]),
           h('aside.teaching-area', {}, [
             h('section.teaching-panel.parameter-panel', {}, [
-              h('p.eyebrow', 'Parameters'),
+              h('p.eyebrow', t('Parameters', language)),
               sidebar,
             ]),
             h('section.teaching-panel', {}, [
-              h('p.eyebrow', 'Concept + key idea'),
-              h('h2', 'Least-squares regression'),
+              h('p.eyebrow', t('Concept + key idea', language)),
+              h('h2', t('Least-squares regression', language)),
               h(
                 'p',
-                'Regression uses a line to describe the relationship between an explanatory variable and a response variable.'
+                t('Regression uses a line to describe the relationship between an explanatory variable and a response variable.', language)
               ),
-              h('h3', 'Residuals explain fit'),
+              h('h3', t('Residuals explain fit', language)),
               h(
                 'p',
-                'The least-squares line is the line that minimizes the sum of squared residuals across the dataset.'
+                t('The least-squares line is the line that minimizes the sum of squared residuals across the dataset.', language)
               ),
             ]),
             h('section.teaching-panel', {}, [
-              h('p.eyebrow', 'Formula'),
+              h('p.eyebrow', t('Formula', language)),
               h('div.latex-formula', {}, [
                 h('div.math-expression', {}, [
                   h('span', 'SSE ='),
@@ -199,14 +209,14 @@ function main(sources: MainSources): MainSinks {
                   h('sup', '2'),
                 ]),
               ]),
-              h('p', 'Compare the custom line and regression line by watching how SSE changes.'),
+              h('p', t('Compare the custom line and regression line by watching how SSE changes.', language)),
             ]),
             h('section.teaching-panel', {}, [
-              h('p.eyebrow', 'Teaching notes'),
-              h('h3', 'Classroom focus'),
+              h('p.eyebrow', t('Teaching notes', language)),
+              h('h3', t('Classroom focus', language)),
               h(
                 'p',
-                'Ask students to predict the slope first, draw their line, and then use residuals to explain why one line fits better.'
+                t('Ask students to predict the slope first, draw their line, and then use residuals to explain why one line fits better.', language)
               ),
             ]),
           ]),

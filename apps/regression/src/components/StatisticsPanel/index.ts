@@ -21,7 +21,7 @@ export function StatisticsPanel(
   // MVI Pattern
   intent(sources);
   const state$ = model(sources);
-  const vdom$ = view(state$);
+  const vdom$ = view(state$, sources.LANGUAGE);
 
   return {
     DOM: vdom$,

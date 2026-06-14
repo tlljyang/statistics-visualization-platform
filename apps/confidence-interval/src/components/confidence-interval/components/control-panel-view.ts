@@ -1,7 +1,8 @@
 import { div, input, button, select, option } from "@cycle/dom";
 import type { ControlPanelState } from "../../control-panel/types";
+import type { ConfidenceIntervalCopy } from "../copy";
 
-export function controlPanelView(state: ControlPanelState) {
+export function controlPanelView(state: ControlPanelState, copy: ConfidenceIntervalCopy) {
   const { sampleSize, populationSD, confidenceLevel, collapsed } = state;
 
   const sliderCard = (
@@ -31,32 +32,28 @@ export function controlPanelView(state: ControlPanelState) {
 
       !collapsed
         ? div(".control-panel", [
-            div(".control-panel__title", ["Confidence Interval Controls"]),
-            div(".control-panel__intro", [
-              "Tune the simulation inputs, then generate repeated samples to see how often intervals capture the true mean.",
-            ]),
+            div(".control-panel__title", [copy.controlsTitle]),
+            div(".control-panel__intro", [copy.controlsIntro]),
             sliderCard(
               "sampleSize",
-              "Sample Size",
+              copy.sampleSize,
               String(sampleSize),
-              "Larger samples usually narrow the confidence interval.",
+              copy.sampleSizeHint,
               { type: "range", min: "1", max: "100", value: String(sampleSize) },
             ),
             sliderCard(
               "populationSD",
-              "Population SD",
+              copy.populationSD,
               populationSD.toFixed(1),
-              "Higher variability makes intervals wider and coverage noisier in small samples.",
+              copy.populationSDHint,
               { type: "range", min: "0.1", max: "10", step: "0.1", value: String(populationSD) },
             ),
             div(".control-panel__group", [
               div(".control-panel__label-row", [
-                div(".control-panel__label", ["Confidence Level"]),
+                div(".control-panel__label", [copy.confidenceLevel]),
                 div(".control-panel__value", [`${Math.round(confidenceLevel * 100)}%`]),
               ]),
-              div(".control-panel__hint", [
-                "Higher confidence captures the true mean more often, but also widens the interval.",
-              ]),
+              div(".control-panel__hint", [copy.confidenceLevelHint]),
               select("#confidenceLevel.form-select.control-panel__select", [
                   option({ attrs: { value: "0.8", selected: confidenceLevel === 0.8 } }, ["80%"]),
                   option({ attrs: { value: "0.9", selected: confidenceLevel === 0.9 } }, ["90%"]),
@@ -66,9 +63,7 @@ export function controlPanelView(state: ControlPanelState) {
             ]),
             div(".control-panel__info-box", [
               div(".control-panel__info-icon", ["i"]),
-              div([
-                "A 95% confidence level means that over the long run, about 95% of intervals constructed this way will contain the true population mean.",
-              ]),
+              div([copy.confidenceInfo]),
             ]),
           ])
         : null,

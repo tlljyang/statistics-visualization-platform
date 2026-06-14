@@ -1,6 +1,8 @@
 import { div, h4, span, small } from '@cycle/dom';
-import type { Stream } from 'xstream';
+import xs, { type Stream } from 'xstream';
 import type { VNode } from '@cycle/dom';
+import { localizeText } from '../../../../shared/i18n';
+import type { Language } from '../../../../shared/language';
 import type { State } from './types';
 
 /**
@@ -12,8 +14,9 @@ import type { State } from './types';
  * @param state$ - State stream
  * @returns Virtual DOM stream
  */
-export function view(state$: Stream<State>): Stream<VNode> {
-  return state$.map((state) => {
+export function view(state$: Stream<State>, language$: Stream<Language>): Stream<VNode> {
+  return xs.combine(state$, language$).map(([state, language]) => {
+    const t = (text: string): string => localizeText(text, language);
     const { sse, hover } = state;
 
     // Format SSE value (fixed to 4 decimal places)
@@ -22,10 +25,10 @@ export function view(state$: Stream<State>): Stream<VNode> {
     // Line type display
     const lineTypeDisplay =
       sse.lineType === 'regression'
-        ? 'Regression Line'
+        ? t('Regression Line')
         : sse.lineType === 'custom'
-        ? 'Custom Line'
-        : 'No Line';
+        ? t('Custom Line')
+        : t('No Line');
 
     // Line type badge class
     const lineTypeBadge =
@@ -36,22 +39,22 @@ export function view(state$: Stream<State>): Stream<VNode> {
         : 'line-badge--none';
 
     return div('.statistics-panel', [
-      h4('.statistics-title', 'Statistics'),
+      h4('.statistics-title', t('Statistics')),
 
       div('.sse-section', [
         div('.stat-row', [
-          span('.stat-label', 'Sum of Squared Errors (SSE)'),
+          span('.stat-label', t('Sum of Squared Errors (SSE)')),
           span('.stat-value', formattedSSE),
         ]),
         div('.stat-row', [
-          span('.stat-label', 'Line Type'),
+          span('.stat-label', t('Line Type')),
           span(`.line-badge.${lineTypeBadge}`, lineTypeDisplay),
         ]),
       ]),
 
       div('.residual-section', [
         div('.residual-row', [
-          span('.stat-label', 'Hover'),
+          span('.stat-label', t('Hover')),
           hover.point !== null &&
           hover.residual !== null &&
           hover.lineY !== null &&
@@ -63,13 +66,13 @@ export function view(state$: Stream<State>): Stream<VNode> {
                   `(${hover.point.x.toFixed(2)}, ${hover.point.y.toFixed(2)})`
                 ),
                 small('.stat-divider', '|'),
-                span('.stat-label', 'Res'),
+                span('.stat-label', t('Res')),
                 span('.stat-value', hover.residual.toFixed(4)),
                 small('.stat-divider', '|'),
-                span('.stat-label', 'Y hat'),
+                span('.stat-label', t('Y hat')),
                 span('.stat-value', hover.lineY.toFixed(4)),
               ])
-            : span('.stat-value.stat-value--muted', 'Hover over a point'),
+            : span('.stat-value.stat-value--muted', t('Hover over a point')),
         ]),
       ]),
     ]);

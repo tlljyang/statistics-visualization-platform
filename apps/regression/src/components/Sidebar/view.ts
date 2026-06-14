@@ -10,28 +10,34 @@ import {
   span,
   type VNode,
 } from '@cycle/dom';
-import { Stream } from 'xstream';
+import xs, { Stream } from 'xstream';
+import { localizeText } from '../../../../shared/i18n';
+import type { Language } from '../../../../shared/language';
 import type { SidebarState } from './types';
 
-export function view(state$: Stream<SidebarState>): Stream<VNode> {
-  return state$.map((state) =>
+export function view(state$: Stream<SidebarState>, language$: Stream<Language>): Stream<VNode> {
+  return xs.combine(state$, language$).map(([state, language]) => {
+    const t = (text: string | undefined): string => text ? localizeText(text, language) : '';
+    const selectedDataset = state.datasets.find((d) => d.id === state.selectedDataset);
+
+    return (
     div('.control-panel', [
-      h2('.control-panel__title', 'Control Panel'),
+      h2('.control-panel__title', t('Control Panel')),
       p(
         '.control-panel__intro',
-        'Choose a dataset, reveal the regression line, and clear your hand-drawn line when you want to try again.'
+        t('Choose a dataset, reveal the regression line, and clear your hand-drawn line when you want to try again.')
       ),
 
       div('.control-panel__group', [
         div('.control-panel__label-row', [
-          span('.control-panel__label', 'Dataset'),
+          span('.control-panel__label', t('Dataset')),
           span('.control-panel__value', String(state.datasets.length)),
         ]),
-        p('.control-panel__hint', 'Switch the scatterplot students are reasoning from.'),
+        p('.control-panel__hint', t('Switch the scatterplot students are reasoning from.')),
         label(
           '.sr-only',
           { attrs: { for: 'dataset-select' } },
-          'Select Dataset'
+          t('Select Dataset')
         ),
         select(
           '#dataset-select.dataset-select.control-panel__select',
@@ -40,7 +46,7 @@ export function view(state$: Stream<SidebarState>): Stream<VNode> {
             state.datasets.length === 0
               ? option(
                   { attrs: { value: '', disabled: true, selected: true } },
-                  'No datasets available'
+                  t('No datasets available')
                 )
               : null,
             ...state.datasets.map((dataset) =>
@@ -51,7 +57,7 @@ export function view(state$: Stream<SidebarState>): Stream<VNode> {
                     selected: dataset.id === state.selectedDataset,
                   },
                 },
-                dataset.name
+                t(dataset.name)
               )
             ),
           ].filter(Boolean)
@@ -61,8 +67,8 @@ export function view(state$: Stream<SidebarState>): Stream<VNode> {
       div('.control-panel__group', [
         label('.toggle-row', { attrs: { for: 'regression-toggle' } }, [
           span('.toggle-row__copy', [
-            span('.control-panel__label', 'Regression line'),
-            span('.control-panel__hint', 'Compare the model fit with a custom line.'),
+            span('.control-panel__label', t('Regression line')),
+            span('.control-panel__hint', t('Compare the model fit with a custom line.')),
           ]),
           input('#regression-toggle.regression-toggle.toggle-row__input', {
             attrs: {
@@ -76,13 +82,13 @@ export function view(state$: Stream<SidebarState>): Stream<VNode> {
       div('.control-panel__group', [
         label('.toggle-row', { attrs: { for: 'outlier-toggle' } }, [
           span('.toggle-row__copy', [
-            span('.control-panel__label', 'Show outliers'),
-            span('.control-panel__hint', 'Hide or reveal influential observations to compare their effect.'),
+            span('.control-panel__label', t('Outliers removed')),
+            span('.control-panel__hint', t('Compare the fit with influential observations excluded.')),
           ]),
           input('#outlier-toggle.outlier-toggle.toggle-row__input', {
             attrs: {
               type: 'checkbox',
-              checked: state.showOutliers,
+              checked: !state.showOutliers,
             },
           }),
         ]),
@@ -92,75 +98,70 @@ export function view(state$: Stream<SidebarState>): Stream<VNode> {
         button(
           '.clear-custom-line.control-panel__button',
           { attrs: { type: 'button' } },
-          'Clear Custom Line'
+          t('Clear Custom Line')
         ),
       ]),
 
       state.datasets.length > 0
         ? div('.control-panel__summary-card', [
               div('.info-item', [
-                span('.metric-label', 'Selected dataset'),
+                span('.metric-label', t('Selected dataset')),
                 span(
                   '.metric-value',
-                  state.datasets.find((d) => d.id === state.selectedDataset)
-                    ?.name || 'None'
+                  t(selectedDataset?.name || 'None')
                 ),
               ]),
               div('.info-item', [
-                span('.metric-label', 'Data points'),
+                span('.metric-label', t('Data points')),
                 span(
                   '.metric-value',
                   String(
-                    (state.datasets.find((d) => d.id === state.selectedDataset)
-                      ?.data.length || 0) -
+                    (selectedDataset?.data.length || 0) -
                       (state.showOutliers
                         ? 0
-                        : state.datasets.find((d) => d.id === state.selectedDataset)
-                            ?.data.filter((point) => point.outlier).length || 0)
+                        : selectedDataset?.data.filter((point) => point.outlier).length || 0)
                   )
                 ),
               ]),
               div('.info-item', [
-                span('.metric-label', 'Outliers'),
+                span('.metric-label', t('Outliers')),
                 span(
                   '.metric-value.metric-value--compact',
                   state.showOutliers
-                    ? 'Shown'
-                    : 'Hidden'
+                    ? t('Included')
+                    : t('Removed')
                 ),
               ]),
-              state.datasets.find((d) => d.id === state.selectedDataset)?.source
+              selectedDataset?.source
                 ? div('.info-item', [
-                    span('.metric-label', 'Source'),
+                    span('.metric-label', t('Source')),
                     span(
                       '.metric-value.metric-value--compact',
-                      state.datasets.find((d) => d.id === state.selectedDataset)
-                        ?.source || ''
+                      t(selectedDataset?.source || '')
                     ),
                   ])
                 : null,
-              state.datasets.find((d) => d.id === state.selectedDataset)?.xLabel
+              selectedDataset?.xLabel
                 ? div('.info-item', [
-                    span('.metric-label', 'X variable'),
+                    span('.metric-label', t('X variable')),
                     span(
                       '.metric-value.metric-value--compact',
-                      state.datasets.find((d) => d.id === state.selectedDataset)
-                        ?.xLabel || ''
+                      t(selectedDataset?.xLabel || '')
                     ),
                   ])
                 : null,
-              state.datasets.find((d) => d.id === state.selectedDataset)?.yLabel
+              selectedDataset?.yLabel
                 ? div('.info-item', [
-                    span('.metric-label', 'Y variable'),
+                    span('.metric-label', t('Y variable')),
                     span(
                       '.metric-value.metric-value--compact',
-                      state.datasets.find((d) => d.id === state.selectedDataset)
-                        ?.yLabel || ''
+                      t(selectedDataset?.yLabel || '')
                     ),
                   ])
                 : null,
           ])
         : null,
     ])
-  );
+    );
+  });
 }

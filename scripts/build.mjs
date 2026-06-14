@@ -35,6 +35,11 @@ const apps = [
     baseSegment: "apps/simulation-random-variable/"
   },
   {
+    name: "simulation-clt",
+    cwd: resolve(projectDir, "apps/simulation-clt"),
+    baseSegment: "apps/simulation-clt/"
+  },
+  {
     name: "simulation-variance-reduction",
     cwd: resolve(projectDir, "apps/simulation-variance-reduction"),
     baseSegment: "apps/simulation-variance-reduction/"

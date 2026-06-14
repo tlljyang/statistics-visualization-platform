@@ -23,9 +23,9 @@ export const moduleConfig: ModuleConfig = {
           "id": "sampleSize",
           "label": "Sample size",
           "type": "number",
-          "min": 100,
+          "min": 1,
           "max": 10000,
-          "step": 100,
+          "step": 1,
           "defaultValue": 1000
         },
         {
@@ -63,9 +63,9 @@ export const moduleConfig: ModuleConfig = {
           "id": "sampleSize",
           "label": "Sample size",
           "type": "number",
-          "min": 100,
+          "min": 1,
           "max": 10000,
-          "step": 100,
+          "step": 1,
           "defaultValue": 1000
         },
         {
@@ -94,9 +94,9 @@ export const moduleConfig: ModuleConfig = {
           "id": "sampleSize",
           "label": "Candidate draws",
           "type": "number",
-          "min": 100,
+          "min": 1,
           "max": 10000,
-          "step": 100,
+          "step": 1,
           "defaultValue": 1500
         },
         {

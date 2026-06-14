@@ -68,6 +68,17 @@ export const visualizers: VisualizerLink[] = [
     source: "wals"
   },
   {
+    id: "simulation-clt",
+    group: "WALS Simulation",
+    label: "中心极限定理",
+    shortLabel: "CLT",
+    pageTitle: "Central Limit Theorem",
+    path: "apps/simulation-clt/",
+    repositoryUrl:
+      "https://github.com/Statistics-Learning-Teaching-Platform/simulation-clt-visualization",
+    source: "wals"
+  },
+  {
     id: "simulation-variance-reduction",
     group: "WALS Simulation",
     label: "方差缩减",

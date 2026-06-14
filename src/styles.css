@@ -42,6 +42,58 @@ button {
   font: inherit;
 }
 
+.platform-language-tabs {
+  position: fixed;
+  top: 18px;
+  right: 24px;
+  z-index: 30;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  min-height: 38px;
+  padding: 4px;
+  border: 1px solid rgba(90, 80, 60, 0.14);
+  border-radius: 999px;
+  background: rgba(255, 252, 246, 0.88);
+  box-shadow: 0 14px 34px rgba(40, 35, 25, 0.11);
+  backdrop-filter: blur(14px);
+}
+
+.platform-language-tab {
+  min-width: 58px;
+  min-height: 30px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 999px;
+  color: var(--text-secondary);
+  background: transparent;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+  transition:
+    background 160ms ease,
+    color 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease;
+}
+
+.platform-language-tab:hover {
+  color: var(--teal);
+  transform: translateY(-1px);
+}
+
+.platform-language-tab[data-active="true"] {
+  color: var(--teal);
+  background: var(--sage-soft);
+  box-shadow: inset 0 0 0 1px rgba(111, 143, 122, 0.22);
+}
+
+.platform-language-tab:focus-visible {
+  outline: 3px solid rgba(141, 117, 181, 0.24);
+  outline-offset: 2px;
+}
+
 .platform-shell {
   display: grid;
   grid-template-columns: 310px minmax(0, 1fr);
@@ -286,10 +338,15 @@ button {
 }
 
 @media (max-width: 980px) {
+  .platform-language-tabs {
+    top: 10px;
+    right: 14px;
+  }
+
   .platform-shell {
     grid-template-columns: 1fr;
     grid-template-rows: auto minmax(0, 1fr);
-    padding: 12px;
+    padding: 56px 12px 12px;
   }
 
   .platform-sidebar {
@@ -315,6 +372,12 @@ button {
 }
 
 @media (max-width: 680px) {
+  .platform-language-tabs {
+    right: 10px;
+    transform: scale(0.94);
+    transform-origin: top right;
+  }
+
   .platform-sidebar {
     grid-template-columns: 1fr;
     max-height: 46vh;

@@ -8,20 +8,24 @@ import Chart from '../Chart';
 import isolate from '@cycle/isolate';
 import xs, { Stream } from 'xstream';
 import type { Reducer } from '@cycle/state';
+import { languageStream } from '../../../../shared/language';
 
 export default function TypeErrorsApp(sources: Sources): Sinks {
   const actions = intent(sources);
   const { reducer$: appReducer$ } = model(actions, sources);
+  const language$ = languageStream();
 
   // Wire child components with isolate
   const controlPanelSinks = isolate(ControlPanel, 'params')({
     DOM: sources.DOM,
-    state: sources.state
+    state: sources.state,
+    LANGUAGE: language$
   });
 
   // Create props stream for Chart from computed state
-  const chartProps$ = sources.state.stream
-    .map(state => ({
+  const chartProps$ = xs.combine(sources.state.stream, language$)
+    .map(([state, language]) => ({
+      language,
       scales: state.computed.scales,
       nullDistribution: state.computed.nullDistribution,
       trueDistribution: state.computed.trueDistribution,
@@ -55,7 +59,7 @@ export default function TypeErrorsApp(sources: Sources): Sinks {
   );
 
   // Pass child DOM streams to view
-  const vdom$ = view(controlPanelSinks.DOM, chartSinks.DOM, sources.state.stream);
+  const vdom$ = view(controlPanelSinks.DOM, chartSinks.DOM, sources.state.stream, language$);
 
   return {
     DOM: vdom$,
