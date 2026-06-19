@@ -15,8 +15,8 @@ function str(controls: ControlMap, id: string, fallback: string): string {
 }
 
 function histogram(values: number[], count = 18): ChartBar[] {
-  const min = Math.min(...values);
-  const max = Math.max(...values);
+  const min = values.reduce((a, b) => Math.min(a, b), Infinity);
+  const max = values.reduce((a, b) => Math.max(a, b), -Infinity);
   const width = (max - min || 1) / count;
   const bins = Array.from({ length: count }, (_, index) => ({
     label: formatNumber(min + width * (index + 0.5), 2),
@@ -108,7 +108,7 @@ function buffon(controls: ControlMap, seed: number): SimulationResult {
   const trials = Math.max(100, Math.round(num(controls, "trials", 1000)));
   const experiments = Math.max(1, Math.round(num(controls, "experiments", 20)));
   const planeWidth = Math.max(1, num(controls, "planeWidth", 6));
-  const needleLength = 1;
+  const needleLength = Math.min(1, planeWidth);
   const estimates: ChartPoint[] = [];
   let totalCrosses = 0;
   for (let experiment = 1; experiment <= experiments; experiment += 1) {
@@ -402,7 +402,7 @@ function bootstrapMax(controls: ControlMap, seed: number): SimulationResult {
   const rng = createRandom(seed);
   const values = parseNumberList(str(controls, "data", "0.5,0.6,0.7"));
   const replicates = Math.max(100, Math.round(num(controls, "replicates", 1000)));
-  const maxima = Array.from({ length: replicates }, () => Math.max(...sampleWithReplacement(rng, values, values.length)));
+  const maxima = Array.from({ length: replicates }, () => sampleWithReplacement(rng, values, values.length).reduce((a, b) => Math.max(a, b), -Infinity));
   return result(
     "Bootstrap distribution of the maximum",
     "Each bootstrap replicate samples observed values with replacement and records the maximum.",
@@ -546,7 +546,8 @@ function anova(controls: ControlMap, seed: number): SimulationResult {
 function confidenceInterval(controls: ControlMap): SimulationResult {
   const mu = 31.5;
   const sigma = 0.3577;
-  const width = num(controls, "nSigma", 2) * Number(sigma.toFixed(2));
+  const sampleSize = Math.max(1, Math.round(num(controls, "sampleSize", 5)));
+  const width = num(controls, "nSigma", 2) * Number(sigma.toFixed(2)) / Math.sqrt(sampleSize);
   const means = [num(controls, "mean1", 31.3), num(controls, "mean2", 31.7), num(controls, "mean3", 32.5)];
   const intervals = [
     { label: "Population", center: mu, lower: mu - width, upper: mu + width, color: "#136f63" },
@@ -557,7 +558,7 @@ function confidenceInterval(controls: ControlMap): SimulationResult {
     "Sample-centered confidence intervals",
     "Intervals are drawn at equal width around the population mean and three sample means.",
     [
-      { label: "interval half-width", value: formatNumber(width, 3), detail: `${num(controls, "nSigma", 2)} sigma` },
+      { label: "interval half-width", value: formatNumber(width, 3), detail: `${num(controls, "nSigma", 2)} sigma / sqrt(${sampleSize})` },
       { label: "covering samples", value: `${covering} / 3`, detail: "sample intervals covering mu" },
       { label: "sample size", value: String(num(controls, "sampleSize", 5)), detail: "kept from WALS control" }
     ],
@@ -583,6 +584,7 @@ function distribution(controls: ControlMap): SimulationResult {
     if (dist === "binom") {
       const size = Math.max(1, Math.round(b));
       const p = Math.min(0.95, Math.max(0.05, a || 0.5));
+      if (x < 0 || x > size || !Number.isInteger(x)) return 0;
       const choose = Array.from({ length: x }, (_, index) => (size - index) / (index + 1)).reduce((product, value) => product * value, 1);
       return choose * p ** x * (1 - p) ** (size - x);
     }
@@ -609,10 +611,10 @@ function linearRegressionExample(controls: ControlMap, _seed: number, data?: { c
   const exclude = str(controls, "excludeHighLeverage", "no") === "yes";
   const source = data?.cities ?? [];
   const kept = exclude ? source.filter((city) => !["上海", "香港"].includes(city.city)) : source;
-  const points = kept.map((city) => ({ x: city[feature], y: city.planing, label: city.city }));
+  const points = kept.map((city) => ({ x: city[feature], y: city.planning, label: city.city }));
   const fit = linearRegression(points);
-  const xMin = Math.min(...points.map((point) => point.x));
-  const xMax = Math.max(...points.map((point) => point.x));
+  const xMin = points.map((point) => point.x).reduce((a, b) => Math.min(a, b), Infinity);
+  const xMax = points.map((point) => point.x).reduce((a, b) => Math.max(a, b), -Infinity);
   const line: ChartSeries = { label: "least squares fit", color: "#d1495b", points: [{ x: xMin, y: fit.intercept + fit.slope * xMin }, { x: xMax, y: fit.intercept + fit.slope * xMax }] };
   return result(
     "City regression model",
@@ -623,7 +625,7 @@ function linearRegressionExample(controls: ControlMap, _seed: number, data?: { c
       { label: "R-squared", value: formatNumber(fit.rSquared, 4), detail: `${kept.length} cities` }
     ],
     { type: "scatter", title: "Planned skyscrapers regression", xLabel: feature, yLabel: "planned", points, line },
-    { columns: ["City", feature, "planned"], rows: kept.map((city) => [city.city, city[feature], city.planing]) }
+    { columns: ["City", feature, "planned"], rows: kept.map((city) => [city.city, city[feature], city.planning]) }
   );
 }
 

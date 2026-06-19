@@ -49,7 +49,7 @@ export interface CityRecord {
   city: string;
   GDP: number;
   completed: number;
-  planing: number;
+  planning: number;
 }
 
 export interface Metric {

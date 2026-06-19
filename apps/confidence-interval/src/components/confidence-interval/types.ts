@@ -38,6 +38,7 @@ export interface State {
   scales: Scales;
   config: Config;
   collapsed: boolean;
+  seed: number;
 }
 
 export interface Actions {

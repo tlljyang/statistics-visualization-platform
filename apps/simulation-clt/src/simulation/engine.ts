@@ -41,8 +41,8 @@ function drawPopulationValue(rng: () => number, shape: string): number {
 }
 
 function histogram(values: number[], count = 18, domain?: [number, number]): ChartBar[] {
-  const min = domain?.[0] ?? Math.min(...values);
-  const max = domain?.[1] ?? Math.max(...values);
+  const min = domain?.[0] ?? values.reduce((a, b) => Math.min(a, b), Infinity);
+  const max = domain?.[1] ?? values.reduce((a, b) => Math.max(a, b), -Infinity);
   const width = (max - min || 1) / count;
   const bins = Array.from({ length: count }, (_, index) => ({
     label: formatNumber(min + width * (index + 0.5), 2),

@@ -13,163 +13,163 @@ export const moduleConfig: ModuleConfig = {
         "city": "海口",
         "GDP": 590.55,
         "completed": 1,
-        "planing": 4
+        "planning": 4
       },
       {
         "city": "兰州",
         "GDP": 1100.39,
         "completed": 0,
-        "planing": 5
+        "planning": 5
       },
       {
         "city": "贵阳",
         "GDP": 1383.07,
         "completed": 2,
-        "planing": 16
+        "planning": 16
       },
       {
         "city": "太原",
         "GDP": 1778.05,
         "completed": 0,
-        "planing": 1
+        "planning": 1
       },
       {
         "city": "南昌",
         "GDP": 2207.11,
         "completed": 3,
-        "planing": 5
+        "planning": 5
       },
       {
         "city": "昆明",
         "GDP": 2509.58,
         "completed": 0,
-        "planing": 6
+        "planning": 6
       },
       {
         "city": "合肥",
         "GDP": 2702.5,
         "completed": 1,
-        "planing": 5
+        "planning": 5
       },
       {
         "city": "福州",
         "GDP": 3065,
         "completed": 2,
-        "planing": 6
+        "planning": 6
       },
       {
         "city": "西安",
         "GDP": 3241.49,
         "completed": 2,
-        "planing": 2
+        "planning": 2
       },
       {
         "city": "长春",
         "GDP": 3329,
         "completed": 1,
-        "planing": 3
+        "planning": 3
       },
       {
         "city": "哈尔滨",
         "GDP": 3665.9,
         "completed": 1,
-        "planing": 1
+        "planning": 1
       },
       {
         "city": "济南",
         "GDP": 3910.8,
         "completed": 0,
-        "planing": 2
+        "planning": 2
       },
       {
         "city": "郑州",
         "GDP": 4002.9,
         "completed": 2,
-        "planing": 3
+        "planning": 3
       },
       {
         "city": "长沙",
         "GDP": 4500,
         "completed": 4,
-        "planing": 11
+        "planning": 11
       },
       {
         "city": "沈阳",
         "GDP": 5015,
         "completed": 7,
-        "planing": 22
+        "planning": 22
       },
       {
         "city": "南京",
         "GDP": 5086,
         "completed": 14,
-        "planing": 21
+        "planning": 21
       },
       {
         "city": "成都",
         "GDP": 5500,
         "completed": 2,
-        "planing": 9
+        "planning": 9
       },
       {
         "city": "武汉",
         "GDP": 5515.76,
         "completed": 7,
-        "planing": 26
+        "planning": 26
       },
       {
         "city": "杭州",
         "GDP": 5945.82,
         "completed": 5,
-        "planing": 6
+        "planning": 6
       },
       {
         "city": "重庆",
         "GDP": 7894.24,
         "completed": 23,
-        "planing": 13
+        "planning": 13
       },
       {
         "city": "天津",
         "GDP": 9108.83,
         "completed": 14,
-        "planing": 26
+        "planning": 26
       },
       {
         "city": "苏州",
         "GDP": 9168,
         "completed": 5,
-        "planing": 10
+        "planning": 10
       },
       {
         "city": "深圳",
         "GDP": 9510.91,
         "completed": 33,
-        "planing": 46
+        "planning": 46
       },
       {
         "city": "广州",
         "GDP": 10604.48,
         "completed": 23,
-        "planing": 36
+        "planning": 36
       },
       {
         "city": "北京",
         "GDP": 13777.9,
         "completed": 6,
-        "planing": 11
+        "planning": 11
       },
       {
         "city": "上海",
         "GDP": 16872.42,
         "completed": 44,
-        "planing": 15
+        "planning": 15
       },
       {
         "city": "香港",
         "GDP": 15790,
         "completed": 54,
-        "planing": 0
+        "planning": 0
       }
     ]
   },

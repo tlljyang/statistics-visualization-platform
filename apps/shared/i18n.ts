@@ -535,9 +535,24 @@ const enToZh: TranslationDictionary = {
   "The WALS city dataset links planned skyscrapers with either completed buildings or GDP.": "WALS 城市数据集把计划中的摩天楼数量与已建建筑数或 GDP 联系起来。"
 };
 
+function hasMixedCase(value: string): boolean {
+  // True only when the string contains both upper- and lower-case letters,
+  // i.e. it is neither ALL CAPS nor all lower-case.
+  return value !== value.toUpperCase() && value !== value.toLowerCase();
+}
+
 const zhToEn: TranslationDictionary = Object.entries(enToZh).reduce<TranslationDictionary>(
   (translations, [english, chinese]) => {
-    translations[chinese] ??= english;
+    const existing = translations[chinese];
+    // Several English phrases can share one Chinese value
+    // (e.g. "Sample Size", "SAMPLE SIZE", "sample size" -> "样本量").
+    // Prefer a mixed-case variant so reverse translation preserves the
+    // canonical UI casing; otherwise keep the first key seen. Using length
+    // as the tiebreaker is wrong because "Concept + key idea" and
+    // "CONCEPT + KEY IDEA" have the same length.
+    if (!existing || (!hasMixedCase(existing) && hasMixedCase(english))) {
+      translations[chinese] = english;
+    }
     return translations;
   },
   {}

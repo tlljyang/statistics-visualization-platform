@@ -8,8 +8,8 @@ const height = 380;
 const margin = { top: 34, right: 24, bottom: 54, left: 64 };
 
 function extent(values: number[], fallback: [number, number]): [number, number] {
-  const min = Math.min(...values);
-  const max = Math.max(...values);
+  const min = values.reduce((a, b) => Math.min(a, b), Infinity);
+  const max = values.reduce((a, b) => Math.max(a, b), -Infinity);
   if (!Number.isFinite(min) || !Number.isFinite(max)) return fallback;
   if (min === max) return [min - 1, max + 1];
   return [min, max];

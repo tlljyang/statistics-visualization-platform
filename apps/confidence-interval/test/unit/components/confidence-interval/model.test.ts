@@ -88,6 +88,7 @@ describe('ConfidenceInterval Model', () => {
         if (!receivedReducer) {
           receivedReducer = true;
           const existingState = {
+            language: "zh" as const,
             sampleSize: 20,
             populationSD: 3,
             confidenceLevel: 0.9,
@@ -101,6 +102,7 @@ describe('ConfidenceInterval Model', () => {
               populationMean: 10,
             },
             collapsed: true,
+            seed: 42,
           };
           const newState = reducer(existingState);
           expect(newState).to.equal(existingState);

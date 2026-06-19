@@ -5,6 +5,17 @@ import type { Language } from "../../../../shared/language";
 import { createScales } from "../../utils/d3-utils";
 import type { Actions, Sample, Scales, Config, State } from "./types";
 
+function createRandom(seed: number): () => number {
+  let value = seed >>> 0;
+  return () => {
+    value += 0x6d2b79f5;
+    let t = value;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
 function createInitialState(language: Language = "zh"): State {
   const config: Config = {
     width: 760,
@@ -30,16 +41,25 @@ function createInitialState(language: Language = "zh"): State {
     scales,
     config,
     collapsed: false,
+    seed: 42,
   };
 }
 
 // Utility functions
-export function generateSample(mean: number, stddev: number, n: number): number[] {
+// The default RNG keeps the 3-argument call sites (tests, direct callers)
+// working; the model always threads its own seeded RNG so coverage stays
+// reproducible across reloads.
+export function generateSample(
+  mean: number,
+  stddev: number,
+  n: number,
+  rng: () => number = Math.random
+): number[] {
   const samples: number[] = [];
   for (let i = 0; i < n; i++) {
-    const u = Math.random();
-    const v = Math.random();
-    const z = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+    const u1 = Math.max(rng(), Number.EPSILON);
+    const u2 = rng();
+    const z = Math.sqrt(-2.0 * Math.log(u1)) * Math.cos(2.0 * Math.PI * u2);
     samples.push(z * stddev + mean);
   }
   return samples;
@@ -50,6 +70,13 @@ export function zScore(confidenceLevel: number): number {
   if (confidenceLevel === 0.99) return 2.5758;
   if (confidenceLevel === 0.9) return 1.6449;
   if (confidenceLevel === 0.8) return 1.2816;
+  // Unsupported levels should never reach here from the UI; warn loudly
+  // instead of silently degrading to the 95% multiplier.
+  if (typeof console !== "undefined") {
+    console.warn(
+      `zScore: unsupported confidence level ${confidenceLevel}, falling back to 1.96 (95%).`
+    );
+  }
   return 1.96;
 }
 
@@ -134,6 +161,7 @@ export default function model(
         const sampleSize = prevState.sampleSize;
         const populationSD = prevState.populationSD;
         const confidenceLevel = prevState.confidenceLevel;
+        const rng = createRandom(prevState.seed);
 
         const { samples, config } = prevState;
         const newSamples: Sample[] = [];
@@ -143,6 +171,7 @@ export default function model(
             config.populationMean,
             populationSD,
             sampleSize,
+            rng,
           );
           const sample = ci(
             arr,
@@ -167,6 +196,7 @@ export default function model(
           samples: updatedSamples,
           coverage,
           scales,
+          seed: prevState.seed + count,
         };
       },
     );
@@ -241,6 +271,7 @@ export default function model(
         samples: [],
         coverage: 0,
         scales,
+        seed: 42,
       };
     },
   );
