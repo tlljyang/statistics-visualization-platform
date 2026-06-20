@@ -1,4 +1,4 @@
-import { languageStream } from "../../../../shared/language";
+import { languageStream } from "@stats-viz/shared/language";
 import type { Sinks, Sources } from "./types";
 import { intent } from "./intent";
 import { model } from "./model";

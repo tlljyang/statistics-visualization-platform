@@ -1,6 +1,6 @@
 import type { Stream } from 'xstream';
 import type { DOMSource, VNode } from '@cycle/dom';
-import type { Language } from '../../../../shared/language';
+import type { Language } from '@stats-viz/shared/language';
 
 // Re-export Point type from RegressionChart for convenience
 export interface Point {

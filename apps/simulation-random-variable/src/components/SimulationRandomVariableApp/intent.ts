@@ -1,4 +1,5 @@
 import xs from "xstream";
+import debounce from "xstream/extra/debounce";
 import type { Actions, ControlValue, Sources } from "./types";
 
 function readControlValue(target: HTMLInputElement | HTMLSelectElement): ControlValue {
@@ -20,7 +21,7 @@ export function intent(sources: Sources): Actions {
   const input$ = dom.select(".control-input").events("input");
   const change$ = dom.select(".control-input").events("change");
 
-  const updateControl$ = xs.merge(input$, change$).map((event: unknown) => {
+  const updateControl$ = xs.merge(input$, change$).compose(debounce(30)).map((event: unknown) => {
     const target = (event as Event).target as HTMLInputElement | HTMLSelectElement;
     return {
       id: target.dataset.controlId ?? "",

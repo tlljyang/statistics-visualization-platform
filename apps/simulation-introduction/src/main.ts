@@ -2,6 +2,7 @@ import { makeDOMDriver } from "@cycle/dom";
 import { run } from "@cycle/run";
 import { SimulationIntroductionApp } from "./components/SimulationIntroductionApp";
 import "./styles/custom.css";
+import "@stats-viz/shared/styles/tokens.css";
 
 run(SimulationIntroductionApp, {
   DOM: makeDOMDriver("#app")

@@ -8,7 +8,7 @@ import Chart from '../Chart';
 import isolate from '@cycle/isolate';
 import xs, { Stream } from 'xstream';
 import type { Reducer } from '@cycle/state';
-import { languageStream } from '../../../../shared/language';
+import { languageStream } from '@stats-viz/shared/language';
 
 export default function TypeErrorsApp(sources: Sources): Sinks {
   const actions = intent(sources);

@@ -63,7 +63,6 @@ function createTempPixels(
     .flatten();
 
   return flattened$
-    .map((data: any) => data)
     .startWith({ start: null, end: null } as Points);
 }
 
@@ -101,7 +100,6 @@ function createFinalPixels(
     .flatten();
 
   return flattened$
-    .map((data: any) => data)
     .filter(({ start, end }: any) => {
       if (!start || !end) return false;
       return start.x !== end.x && start.y !== end.y;

@@ -1,6 +1,6 @@
 import { Stream } from 'xstream';
 import type { VNode } from '@cycle/dom';
-import type { Language } from '../../../../shared/language';
+import type { Language } from '@stats-viz/shared/language';
 
 export interface DistributionPoint {
   x: number;

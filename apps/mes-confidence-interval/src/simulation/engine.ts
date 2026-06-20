@@ -1,6 +1,7 @@
-import type { ChartBar, ChartPoint, ChartSeries, CityRecord, ControlValue, ExampleConfig, SimulationResult, TableSpec } from "../components/MesConfidenceIntervalApp/types";
-import { createRandom, exponentialRandom, normalRandom, sampleWithReplacement } from "../utils/random";
-import { formatNumber, mean, parseNumberList, quantile, standardDeviation, variance } from "../utils/format";
+import type { ChartPoint, ChartSeries, CityRecord, ControlValue, ExampleConfig, SimulationResult, TableSpec } from "../components/MesConfidenceIntervalApp/types";
+import { createRandom, exponentialRandom, normalRandom, sampleWithReplacement } from "@stats-viz/shared/random";
+import { formatNumber, mean, parseNumberList, quantile, standardDeviation, variance } from "@stats-viz/shared/format";
+import { normalCdf, normalPdf, histogram, linearRegression } from "@stats-viz/shared/math";
 
 type ControlMap = Record<string, ControlValue>;
 
@@ -12,60 +13,6 @@ function num(controls: ControlMap, id: string, fallback: number): number {
 function str(controls: ControlMap, id: string, fallback: string): string {
   const value = controls[id];
   return typeof value === "string" ? value : fallback;
-}
-
-function histogram(values: number[], count = 18): ChartBar[] {
-  const min = values.reduce((a, b) => Math.min(a, b), Infinity);
-  const max = values.reduce((a, b) => Math.max(a, b), -Infinity);
-  const width = (max - min || 1) / count;
-  const bins = Array.from({ length: count }, (_, index) => ({
-    label: formatNumber(min + width * (index + 0.5), 2),
-    value: 0
-  }));
-
-  for (const value of values) {
-    const index = Math.min(count - 1, Math.max(0, Math.floor((value - min) / width)));
-    bins[index].value += 1;
-  }
-
-  return bins;
-}
-
-function normalPdf(x: number, mu = 0, sd = 1): number {
-  return Math.exp(-0.5 * ((x - mu) / sd) ** 2) / (sd * Math.sqrt(2 * Math.PI));
-}
-
-function erf(x: number): number {
-  const sign = Math.sign(x);
-  const a1 = 0.254829592;
-  const a2 = -0.284496736;
-  const a3 = 1.421413741;
-  const a4 = -1.453152027;
-  const a5 = 1.061405429;
-  const p = 0.3275911;
-  const absX = Math.abs(x);
-  const t = 1 / (1 + p * absX);
-  const y = 1 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-absX * absX);
-  return sign * y;
-}
-
-function normalCdf(x: number, mu = 0, sd = 1): number {
-  return 0.5 * (1 + erf((x - mu) / (sd * Math.sqrt(2))));
-}
-
-function linearRegression(points: Array<{ x: number; y: number }>) {
-  const xMean = mean(points.map((point) => point.x));
-  const yMean = mean(points.map((point) => point.y));
-  const sxx = points.reduce((sum, point) => sum + (point.x - xMean) ** 2, 0);
-  const sxy = points.reduce((sum, point) => sum + (point.x - xMean) * (point.y - yMean), 0);
-  const slope = sxy / sxx;
-  const intercept = yMean - slope * xMean;
-  const fitted = points.map((point) => intercept + slope * point.x);
-  const sst = points.reduce((sum, point) => sum + (point.y - yMean) ** 2, 0);
-  const sse = points.reduce((sum, point, index) => sum + (point.y - fitted[index]) ** 2, 0);
-  const rSquared = 1 - sse / sst;
-
-  return { slope, intercept, rSquared, sse };
 }
 
 function result(

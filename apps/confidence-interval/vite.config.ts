@@ -8,6 +8,12 @@ export default defineConfig({
       "@components": "/src/components",
     },
   },
+  test: {
+    environment: "jsdom",
+  },
+  optimizeDeps: {
+    exclude: ["@stats-viz/shared"]
+  },
   server: {
     port: 5173,
     strictPort: false,

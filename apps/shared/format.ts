@@ -1,3 +1,6 @@
+// Number formatting + descriptive statistics shared across the WALS simulation apps.
+// Source: consolidated from the byte-identical apps/*/src/utils/format.ts copies.
+
 export function formatNumber(value: number, digits = 4): string {
   if (!Number.isFinite(value)) {
     return "n/a";

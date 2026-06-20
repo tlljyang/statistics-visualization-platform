@@ -1,7 +1,7 @@
 import type { ScaleLinear } from 'd3';
 import type { Stream } from 'xstream';
 import type { DOMSource, VNode } from '@cycle/dom';
-import type { Language } from '../../../../shared/language';
+import type { Language } from '@stats-viz/shared/language';
 
 // ==================== Input Props ====================
 export interface RegressionChartProps {

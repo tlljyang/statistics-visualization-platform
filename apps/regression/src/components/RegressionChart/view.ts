@@ -1,7 +1,7 @@
 import type { Stream } from 'xstream';
 import { svg, h } from '@cycle/dom';
 import type { VNode } from '@cycle/dom';
-import { localizeText } from '../../../../shared/i18n';
+import { localizeText } from '@stats-viz/shared/i18n';
 import type { State } from './types';
 import { createXAxisVNode, createYAxisVNode } from '../../d3/axes';
 import {

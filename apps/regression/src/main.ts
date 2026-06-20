@@ -5,6 +5,7 @@ import xs, { Stream } from 'xstream';
 import { h } from '@cycle/dom';
 
 import './styles/custom.css';
+import "@stats-viz/shared/styles/tokens.css";
 import { localizeText } from '../../shared/i18n';
 import { languageStream, type Language } from '../../shared/language';
 import { getRegressionDataBaseUrl } from './dataBaseUrl';
@@ -93,12 +94,13 @@ function main(sources: MainSources): MainSinks {
         yMax = 0;
 
       if (data.length > 0) {
-        const xValues = data.map((d) => d.x);
-        const yValues = data.map((d) => d.y);
-        xMin = Math.min(...xValues);
-        xMax = Math.max(...xValues);
-        yMin = Math.min(...yValues);
-        yMax = Math.max(...yValues);
+        // Use reduce instead of Math.min/max(...spread) so large datasets
+        // (e.g. textbook tables with thousands of rows) cannot blow the
+        // V8 spread-argument limit (~65535) and throw a RangeError.
+        xMin = data.reduce((min, d) => Math.min(min, d.x), Infinity);
+        xMax = data.reduce((max, d) => Math.max(max, d.x), -Infinity);
+        yMin = data.reduce((min, d) => Math.min(min, d.y), Infinity);
+        yMax = data.reduce((max, d) => Math.max(max, d.y), -Infinity);
 
         // Add padding to the domains (10% on each side)
         const xPadding = (xMax - xMin) * 0.1 || 1;

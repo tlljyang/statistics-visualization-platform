@@ -1,10 +1,10 @@
+import { describe, it, expect } from 'vitest';
 import xs from 'xstream';
-import { expect } from 'chai';
 import { view } from '../../../src/components/Chart/view';
 import type { ChartProps } from '../../../src/components/Chart/types';
 
 describe('Chart view', () => {
-  it('should render SVG container', (done) => {
+  it('should render SVG container', () => {
     const mockScales = {
       xScale: (val: number) => val,
       yScale: (val: number) => val
@@ -24,20 +24,21 @@ describe('Chart view', () => {
     const props$ = xs.of(props);
     const vdom$ = view(props$);
 
-    vdom$.addListener({
-      next: (vnode) => {
-        expect(vnode).to.exist;
-        expect(vnode.sel).to.include('div');
-        // Check if selector contains the class
-        expect(vnode.sel).to.include('.chart');
-        done();
-      },
-      error: done,
-      complete: () => {}
+    return new Promise<void>((resolve, reject) => {
+      vdom$.addListener({
+        next: (vnode) => {
+          expect(vnode).toBeDefined();
+          expect(vnode.sel).toContain('div');
+          expect(vnode.sel).toContain('.chart');
+          resolve();
+        },
+        error: reject,
+        complete: () => {}
+      });
     });
   });
 
-  it('should render with correct props data', (done) => {
+  it('should render with correct props data', () => {
     const mockScales = {
       xScale: (val: number) => val * 10,
       yScale: (val: number) => val * 5
@@ -62,16 +63,18 @@ describe('Chart view', () => {
     const props$ = xs.of(props);
     const vdom$ = view(props$);
 
-    let called = false;
-    vdom$.addListener({
-      next: (vnode) => {
-        if (called) return;
-        called = true;
-        expect(vnode).to.exist;
-        done();
-      },
-      error: done,
-      complete: () => {}
+    return new Promise<void>((resolve, reject) => {
+      let called = false;
+      vdom$.addListener({
+        next: (vnode) => {
+          if (called) return;
+          called = true;
+          expect(vnode).toBeDefined();
+          resolve();
+        },
+        error: reject,
+        complete: () => {}
+      });
     });
   });
 });

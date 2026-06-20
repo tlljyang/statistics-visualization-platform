@@ -1,7 +1,7 @@
 import xs from 'xstream';
 import fromDiagram from 'xstream/extra/fromDiagram';
 import { mockDOMSource } from '@cycle/dom';
-import { expect } from 'chai';
+import { expect } from 'vitest';
 
 export function createMockDOMSource(events: Record<string, string>) {
   const sources: Record<string, any> = {};
@@ -18,7 +18,7 @@ export function createMockDOMSource(events: Record<string, string>) {
 export function expectStreamSequence<T>(
   stream: xs<T>,
   expected: T[],
-  done: Mocha.Done
+  done: (error?: unknown) => void
 ) {
   const actual: T[] = [];
 
@@ -26,7 +26,7 @@ export function expectStreamSequence<T>(
     next: (val) => actual.push(val),
     complete: () => {
       try {
-        expect(actual).to.deep.equal(expected);
+        expect(actual).toStrictEqual(expected);
         done();
       } catch (e) {
         done(e);

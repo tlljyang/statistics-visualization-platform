@@ -1,4 +1,4 @@
-import type { Language } from "../../../../shared/language";
+import type { Language } from "@stats-viz/shared/language";
 
 export interface ConfidenceIntervalCopy {
   coreVisualizer: string;

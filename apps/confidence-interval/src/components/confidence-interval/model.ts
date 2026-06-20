@@ -1,7 +1,7 @@
 import xs, { type Stream } from "xstream";
 import dropRepeats from "xstream/extra/dropRepeats";
 import * as d3 from "d3";
-import type { Language } from "../../../../shared/language";
+import type { Language } from "@stats-viz/shared/language";
 import { createScales } from "../../utils/d3-utils";
 import type { Actions, Sample, Scales, Config, State } from "./types";
 

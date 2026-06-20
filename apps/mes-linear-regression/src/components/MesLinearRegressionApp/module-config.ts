@@ -8,6 +8,7 @@ export const moduleConfig: ModuleConfig = {
   "category": "WALS MES",
   "sourcePath": "apps/MES/LinearRegression",
   "data": {
+    "source": "表8-13 中国城市摩天大楼数量(教材数据,具体教材版本待补充)",
     "cities": [
       {
         "city": "海口",

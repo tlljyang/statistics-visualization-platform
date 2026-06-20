@@ -1,7 +1,7 @@
 import { h } from "@cycle/dom";
 import type { VNode } from "@cycle/dom";
 import type { Stream } from "xstream";
-import { localizeText } from "../../../../shared/i18n";
+import { localizeText } from "@stats-viz/shared/i18n";
 import { chartToVNode } from "../../d3/charts";
 import type { ControlConfig, ControlValue, State } from "./types";
 

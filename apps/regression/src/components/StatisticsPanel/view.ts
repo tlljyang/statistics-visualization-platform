@@ -1,8 +1,8 @@
 import { div, h4, span, small } from '@cycle/dom';
 import xs, { type Stream } from 'xstream';
 import type { VNode } from '@cycle/dom';
-import { localizeText } from '../../../../shared/i18n';
-import type { Language } from '../../../../shared/language';
+import { localizeText } from '@stats-viz/shared/i18n';
+import type { Language } from '@stats-viz/shared/language';
 import type { State } from './types';
 
 /**

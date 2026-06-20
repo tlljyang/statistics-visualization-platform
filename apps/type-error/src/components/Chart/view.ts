@@ -1,7 +1,7 @@
 import xs, { Stream } from 'xstream';
 import type { VNode } from '@cycle/dom';
 import { h, svg } from '@cycle/dom';
-import { localizeText } from '../../../../shared/i18n';
+import { localizeText } from '@stats-viz/shared/i18n';
 import type { ChartProps } from './types';
 import {
   NullDistribution,

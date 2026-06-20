@@ -1,7 +1,7 @@
 import type { VNode } from "@cycle/dom";
 import type { Stream } from "xstream";
 import { withState } from "@cycle/state";
-import { languageStream } from "../../../../shared/language";
+import { languageStream } from "@stats-viz/shared/language";
 import intent from "./intent";
 import model from "./model";
 import view from "./view";

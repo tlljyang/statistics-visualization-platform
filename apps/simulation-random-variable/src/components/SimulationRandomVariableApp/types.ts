@@ -1,7 +1,7 @@
 import type { Stream } from "xstream";
 import type { DOMSource, VNode } from "@cycle/dom";
-import type { TemplateCopy } from "../../../../shared/i18n";
-import type { Language } from "../../../../shared/language";
+import type { TemplateCopy } from "@stats-viz/shared/i18n";
+import type { Language } from "@stats-viz/shared/language";
 
 export type ControlValue = number | string;
 export type ControlType = "number" | "select" | "text";

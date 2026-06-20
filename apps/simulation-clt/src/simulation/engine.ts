@@ -1,12 +1,12 @@
 import type {
-  ChartBar,
   ChartPoint,
   ControlValue,
   ExampleConfig,
   SimulationResult,
 } from "../components/SimulationCltApp/types";
-import { createRandom, exponentialRandom, normalRandom } from "../utils/random";
-import { formatNumber, mean, standardDeviation } from "../utils/format";
+import { createRandom, exponentialRandom, normalRandom } from "@stats-viz/shared/random";
+import { formatNumber, mean, standardDeviation } from "@stats-viz/shared/format";
+import { normalPdf, histogram } from "@stats-viz/shared/math";
 
 type ControlMap = Record<string, ControlValue>;
 
@@ -38,28 +38,6 @@ function drawPopulationValue(rng: () => number, shape: string): number {
   }
 
   return exponentialRandom(rng, 1) - 1;
-}
-
-function histogram(values: number[], count = 18, domain?: [number, number]): ChartBar[] {
-  const min = domain?.[0] ?? values.reduce((a, b) => Math.min(a, b), Infinity);
-  const max = domain?.[1] ?? values.reduce((a, b) => Math.max(a, b), -Infinity);
-  const width = (max - min || 1) / count;
-  const bins = Array.from({ length: count }, (_, index) => ({
-    label: formatNumber(min + width * (index + 0.5), 2),
-    value: 0,
-  }));
-
-  for (const value of values) {
-    if (value < min || value > max) continue;
-    const index = Math.min(count - 1, Math.max(0, Math.floor((value - min) / width)));
-    bins[index].value += 1;
-  }
-
-  return bins;
-}
-
-function normalPdf(x: number, mu: number, sd: number): number {
-  return Math.exp(-0.5 * ((x - mu) / sd) ** 2) / (sd * Math.sqrt(2 * Math.PI));
 }
 
 function populationForShape(shape: string): number[] {

@@ -2,7 +2,7 @@ import { type ScaleLinear } from "d3";
 import type { Stream } from "xstream";
 import type { DOMSource } from "@cycle/dom";
 import type { VNode } from "@cycle/dom";
-import type { Language } from "../../../../shared/language";
+import type { Language } from "@stats-viz/shared/language";
 
 export interface Sample {
   lower: number;

@@ -5,14 +5,23 @@ import { visualizers } from "../src/visualizers";
 
 describe("platform integration inventory", () => {
   it("builds every registered visualizer app", () => {
+    // build.mjs derives its app list from the single registry (scripts/apps.mjs)
+    // that src/visualizers.ts also consumes, so every registered visualizer is
+    // built by construction. Guard against someone re-hardcoding a separate
+    // list in build.mjs (which would reintroduce the 3-place drift).
     const buildScript = readFileSync(
       resolve(process.cwd(), "scripts/build.mjs"),
       "utf8"
     );
+    expect(buildScript).toContain("./apps.mjs");
 
+    const registrySource = readFileSync(
+      resolve(process.cwd(), "scripts/apps.mjs"),
+      "utf8"
+    );
     for (const visualizer of visualizers) {
-      expect(buildScript).toContain(`name: "${visualizer.id}"`);
-      expect(buildScript).toContain(`baseSegment: "${visualizer.path}"`);
+      expect(registrySource).toContain(`id: "${visualizer.id}"`);
+      expect(registrySource).toContain(`path: "${visualizer.path}"`);
     }
   });
 

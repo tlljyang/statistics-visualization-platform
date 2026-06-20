@@ -1,3 +1,6 @@
+// Seeded RNG + distribution samplers shared across the WALS simulation apps.
+// Source: consolidated from the byte-identical apps/*/src/utils/random.ts copies.
+
 export function createRandom(seed: number): () => number {
   let value = seed >>> 0;
 

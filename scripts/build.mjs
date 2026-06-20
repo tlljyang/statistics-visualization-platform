@@ -1,80 +1,24 @@
-import { execFileSync } from "node:child_process";
+import { execFile, execFileSync } from "node:child_process";
+import { promisify } from "node:util";
 import { rmSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { apps as registry } from "./apps.mjs";
 
+const execFileAsync = promisify(execFile);
 const rootDir = dirname(fileURLToPath(import.meta.url));
 const projectDir = resolve(rootDir, "..");
 const distDir = resolve(projectDir, "dist");
 const basePath = process.env.BASE_PATH ?? "/";
 
-const apps = [
-  {
-    name: "confidence-interval",
-    cwd: resolve(projectDir, "apps/confidence-interval"),
-    baseSegment: "apps/confidence-interval/"
-  },
-  {
-    name: "type-error",
-    cwd: resolve(projectDir, "apps/type-error"),
-    baseSegment: "apps/type-error/"
-  },
-  {
-    name: "regression",
-    cwd: resolve(projectDir, "apps/regression"),
-    baseSegment: "apps/regression/"
-  },
-  {
-    name: "simulation-introduction",
-    cwd: resolve(projectDir, "apps/simulation-introduction"),
-    baseSegment: "apps/simulation-introduction/"
-  },
-  {
-    name: "simulation-random-variable",
-    cwd: resolve(projectDir, "apps/simulation-random-variable"),
-    baseSegment: "apps/simulation-random-variable/"
-  },
-  {
-    name: "simulation-clt",
-    cwd: resolve(projectDir, "apps/simulation-clt"),
-    baseSegment: "apps/simulation-clt/"
-  },
-  {
-    name: "simulation-variance-reduction",
-    cwd: resolve(projectDir, "apps/simulation-variance-reduction"),
-    baseSegment: "apps/simulation-variance-reduction/"
-  },
-  {
-    name: "simulation-resampling",
-    cwd: resolve(projectDir, "apps/simulation-resampling"),
-    baseSegment: "apps/simulation-resampling/"
-  },
-  {
-    name: "simulation-mcmc",
-    cwd: resolve(projectDir, "apps/simulation-mcmc"),
-    baseSegment: "apps/simulation-mcmc/"
-  },
-  {
-    name: "mes-anova",
-    cwd: resolve(projectDir, "apps/mes-anova"),
-    baseSegment: "apps/mes-anova/"
-  },
-  {
-    name: "mes-confidence-interval",
-    cwd: resolve(projectDir, "apps/mes-confidence-interval"),
-    baseSegment: "apps/mes-confidence-interval/"
-  },
-  {
-    name: "mes-distributions",
-    cwd: resolve(projectDir, "apps/mes-distributions"),
-    baseSegment: "apps/mes-distributions/"
-  },
-  {
-    name: "mes-linear-regression",
-    cwd: resolve(projectDir, "apps/mes-linear-regression"),
-    baseSegment: "apps/mes-linear-regression/"
-  }
-];
+// Derive the per-app build list from the single source of truth in apps.mjs
+// (the same registry src/visualizers.ts consumes). Adding an app = one record
+// there; no need to touch this file.
+const apps = registry.map((app) => ({
+  name: app.id,
+  cwd: resolve(projectDir, app.path.replace(/\/$/, "")),
+  baseSegment: app.path
+}));
 
 function joinBase(base, segment) {
   const normalizedBase = base.endsWith("/") ? base : `${base}/`;
@@ -91,12 +35,17 @@ function run(command, args, cwd = projectDir) {
 
 rmSync(distDir, { force: true, recursive: true });
 
+// Root shell build runs first (synchronously) since it emits the shared dist/
+// assets the per-app builds rely on.
 run("npx", ["vite", "build", "--base", basePath]);
 
-for (const app of apps) {
-  run(
-    "npm",
-    [
+// Build all apps in parallel: each writes to its own dist/apps/<name> directory
+// (--emptyOutDir=false), so there are no write conflicts between concurrent
+// builds. This replaces the previous serial loop and cuts CI wall-clock time.
+await Promise.all(
+  apps.map(async (app) => {
+    console.log(`[build] ${app.name} starting`);
+    const args = [
       "run",
       "build",
       "--",
@@ -105,7 +54,20 @@ for (const app of apps) {
       "--outDir",
       resolve(distDir, "apps", app.name),
       "--emptyOutDir=false"
-    ],
-    app.cwd
-  );
-}
+    ];
+    try {
+      const { stdout, stderr } = await execFileAsync("npm", args, {
+        cwd: app.cwd,
+        env: process.env
+      });
+      if (stdout) process.stdout.write(`[${app.name}] ${stdout}`);
+      if (stderr) process.stderr.write(`[${app.name}] ${stderr}`);
+      console.log(`[build] ${app.name} done`);
+    } catch (error) {
+      console.error(`[build] ${app.name} failed`);
+      if (error.stdout) process.stderr.write(error.stdout.toString());
+      if (error.stderr) process.stderr.write(error.stderr.toString());
+      throw error;
+    }
+  })
+);

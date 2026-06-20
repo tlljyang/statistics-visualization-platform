@@ -1,8 +1,8 @@
 import xs, { Stream } from 'xstream';
 import type { VNode } from '@cycle/dom';
 import { div, label, input, span, p } from '@cycle/dom';
-import { localizeText } from '../../../../shared/i18n';
-import type { Language } from '../../../../shared/language';
+import { localizeText } from '@stats-viz/shared/i18n';
+import type { Language } from '@stats-viz/shared/language';
 import type { ParamsState } from './types';
 
 function formatValue(value: number): string {

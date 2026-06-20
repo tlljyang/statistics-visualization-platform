@@ -11,8 +11,8 @@ import {
   type VNode,
 } from '@cycle/dom';
 import xs, { Stream } from 'xstream';
-import { localizeText } from '../../../../shared/i18n';
-import type { Language } from '../../../../shared/language';
+import { localizeText } from '@stats-viz/shared/i18n';
+import type { Language } from '@stats-viz/shared/language';
 import type { SidebarState } from './types';
 
 export function view(state$: Stream<SidebarState>, language$: Stream<Language>): Stream<VNode> {

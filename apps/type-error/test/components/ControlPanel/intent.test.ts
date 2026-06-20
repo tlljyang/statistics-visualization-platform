@@ -1,12 +1,12 @@
+import { describe, it, expect } from 'vitest';
 import xs from 'xstream';
-import { expect } from 'chai';
 import fromDiagram from 'xstream/extra/fromDiagram';
 import { mockDOMSource } from '@cycle/dom';
 import { intent } from '../../../src/components/ControlPanel/intent';
 import type { Sources } from '../../../src/components/ControlPanel/types';
 
 describe('ControlPanel intent', () => {
-  it('should extract alpha slider input sequence', (done) => {
+  it('should extract alpha slider input sequence', () => {
     const diagram = 'a-b-c-|';
     const inputValues = ['0.05', '0.08', '0.10'];
     let index = 0;
@@ -24,18 +24,20 @@ describe('ControlPanel intent', () => {
     const actions = intent(sources);
     const values: number[] = [];
 
-    actions.alpha$.addListener({
-      next: (val) => values.push(val),
-      complete: () => {
-        expect(values).to.have.length(3);
-        expect(values).to.deep.equal([0.05, 0.08, 0.10]);
-        done();
-      },
-      error: done
+    return new Promise<void>((resolve, reject) => {
+      actions.alpha$.addListener({
+        next: (val) => values.push(val),
+        complete: () => {
+          expect(values).toHaveLength(3);
+          expect(values).toStrictEqual([0.05, 0.08, 0.10]);
+          resolve();
+        },
+        error: reject
+      });
     });
   });
 
-  it('should extract nullMean slider input', (done) => {
+  it('should extract nullMean slider input', () => {
     const diagram = 'a-b-|';
     const DOM = mockDOMSource({
       '#null-mean': {
@@ -51,18 +53,20 @@ describe('ControlPanel intent', () => {
     const actions = intent(sources);
     const values: number[] = [];
 
-    actions.nullMean$.addListener({
-      next: (val) => values.push(val),
-      complete: () => {
-        expect(values).to.have.length(2);
-        expect(values.every(v => v === 0)).to.be.true;
-        done();
-      },
-      error: done
+    return new Promise<void>((resolve, reject) => {
+      actions.nullMean$.addListener({
+        next: (val) => values.push(val),
+        complete: () => {
+          expect(values).toHaveLength(2);
+          expect(values.every(v => v === 0)).toBe(true);
+          resolve();
+        },
+        error: reject
+      });
     });
   });
 
-  it('should extract trueMean slider input', (done) => {
+  it('should extract trueMean slider input', () => {
     const diagram = 'a-b-c-d-|';
     const DOM = mockDOMSource({
       '#true-mean': {
@@ -78,18 +82,20 @@ describe('ControlPanel intent', () => {
     const actions = intent(sources);
     const values: number[] = [];
 
-    actions.trueMean$.addListener({
-      next: (val) => values.push(val),
-      complete: () => {
-        expect(values).to.have.length(4);
-        expect(values.every(v => v === 1)).to.be.true;
-        done();
-      },
-      error: done
+    return new Promise<void>((resolve, reject) => {
+      actions.trueMean$.addListener({
+        next: (val) => values.push(val),
+        complete: () => {
+          expect(values).toHaveLength(4);
+          expect(values.every(v => v === 1)).toBe(true);
+          resolve();
+        },
+        error: reject
+      });
     });
   });
 
-  it('should extract stdDev slider input', (done) => {
+  it('should extract stdDev slider input', () => {
     const diagram = 'a-|';
     const DOM = mockDOMSource({
       '#std-dev': {
@@ -105,14 +111,16 @@ describe('ControlPanel intent', () => {
     const actions = intent(sources);
     const values: number[] = [];
 
-    actions.stdDev$.addListener({
-      next: (val) => values.push(val),
-      complete: () => {
-        expect(values).to.have.length(1);
-        expect(values[0]).to.equal(1);
-        done();
-      },
-      error: done
+    return new Promise<void>((resolve, reject) => {
+      actions.stdDev$.addListener({
+        next: (val) => values.push(val),
+        complete: () => {
+          expect(values).toHaveLength(1);
+          expect(values[0]).toBe(1);
+          resolve();
+        },
+        error: reject
+      });
     });
   });
 });

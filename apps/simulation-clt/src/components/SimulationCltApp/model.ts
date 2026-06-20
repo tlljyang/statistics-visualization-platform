@@ -1,6 +1,6 @@
 import xs, { type Stream } from "xstream";
-import { localizeModuleConfig, localizeSimulationResult, templateCopy } from "../../../../shared/i18n";
-import type { Language } from "../../../../shared/language";
+import { localizeModuleConfig, localizeSimulationResult, templateCopy } from "@stats-viz/shared/i18n";
+import type { Language } from "@stats-viz/shared/language";
 import { generateSampleMeans, runExample } from "../../simulation/engine";
 import { moduleConfig } from "./module-config";
 import type { Actions, ControlValue, ExampleConfig, ModuleConfig, State } from "./types";
@@ -110,5 +110,5 @@ export function model(actions: Actions, language$: Stream<Language> = xs.of<Lang
 
   return xs
     .merge(languageReducer$, selectReducer$, updateReducer$, drawSamplesReducer$, runReducer$)
-    .fold((state, reducer) => reducer(state), createState());
+    .fold((state, reducer) => reducer(state), createState(undefined, undefined, Date.now()));
 }
