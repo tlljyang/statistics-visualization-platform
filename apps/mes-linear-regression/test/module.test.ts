@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { moduleConfig } from "../src/components/MesLinearRegressionApp/module-config";
-import { createDefaultControls, createState } from "../src/components/MesLinearRegressionApp/model";
-import { runExample } from "../src/simulation/engine";
+import { moduleConfig } from "../src/module-config";
+import { createState } from "@stats-viz/shared/wals/WalsApp";
+import { runExample } from "@stats-viz/shared/wals/engine";
 
 describe("MES Linear Regression", () => {
   it("keeps the migrated WALS source scope in module metadata", () => {
@@ -9,22 +9,17 @@ describe("MES Linear Regression", () => {
     expect(moduleConfig.examples.length).toBe(1);
   });
 
-  it("creates default controls for every migrated template", () => {
-    for (const example of moduleConfig.examples) {
-      const controls = createDefaultControls(example);
-      expect(Object.keys(controls)).toEqual(example.controls.map((control) => control.id));
-    }
-  });
-
-  it("calculates a teaching result for the default template", () => {
-    const state = createState();
+  it("creates a teaching result for the default template", () => {
+    const state = createState(moduleConfig, undefined, undefined, 510, "zh");
     expect(state.result.metrics.length).toBeGreaterThan(0);
     expect(state.result.chart.title.length).toBeGreaterThan(0);
   });
 
   it("calculates each migrated template without throwing", () => {
     for (const example of moduleConfig.examples) {
-      const controls = createDefaultControls(example);
+      const controls = Object.fromEntries(
+        example.controls.map((control) => [control.id, control.defaultValue]),
+      );
       const result = runExample(example, controls, 510, moduleConfig.data);
       expect(result.headline.length).toBeGreaterThan(0);
       expect(result.metrics.length).toBeGreaterThan(0);

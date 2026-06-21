@@ -5,12 +5,17 @@
   "type": "module",
   "exports": {
     ".": "./index.ts",
-    "./i18n": "./i18n.ts",
-    "./language": "./language.ts",
+    "./i18n": "./i18n/index.tsx",
+    "./i18n/legacy": "./i18n/legacy.ts",
     "./random": "./random.ts",
     "./format": "./format.ts",
     "./math": "./math.ts",
-    "./styles/tokens": "./styles/tokens.css"
+    "./wals/types": "./wals/types.ts",
+    "./wals/engine": "./wals/engine.ts",
+    "./wals/charts": "./wals/charts.tsx",
+    "./wals/WalsApp": "./wals/WalsApp.tsx",
+    "./styles/tokens": "./styles/tokens.css",
+    "./styles/tokens.css": "./styles/tokens.css"
   },
   "types": "./index.ts"
 }

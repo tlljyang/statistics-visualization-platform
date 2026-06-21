@@ -5,16 +5,10 @@ import { visualizers } from "../src/visualizers";
 
 describe("platform integration inventory", () => {
   it("builds every registered visualizer app", () => {
-    // build.mjs derives its app list from the single registry (scripts/apps.mjs)
-    // that src/visualizers.ts also consumes, so every registered visualizer is
-    // built by construction. Guard against someone re-hardcoding a separate
-    // list in build.mjs (which would reintroduce the 3-place drift).
-    const buildScript = readFileSync(
-      resolve(process.cwd(), "scripts/build.mjs"),
-      "utf8"
-    );
-    expect(buildScript).toContain("./apps.mjs");
-
+    // The SPA shell imports all apps via dynamic imports in appRegistry.tsx,
+    // so Vite automatically code-splits each app. The single source of truth
+    // for the app registry lives in scripts/apps.mjs, consumed by both
+    // src/visualizers.ts and src/shell/appRegistry.tsx.
     const registrySource = readFileSync(
       resolve(process.cwd(), "scripts/apps.mjs"),
       "utf8"
@@ -23,6 +17,18 @@ describe("platform integration inventory", () => {
       expect(registrySource).toContain(`id: "${visualizer.id}"`);
       expect(registrySource).toContain(`path: "${visualizer.path}"`);
     }
+
+    // appRegistry.tsx must derive every app from the single source of truth
+    // (apps.mjs) via dynamic glob discovery, so each app is bundled.
+    const appRegistrySource = readFileSync(
+      resolve(process.cwd(), "src/shell/appRegistry.tsx"),
+      "utf8"
+    );
+    expect(appRegistrySource).toContain("apps.mjs");
+    expect(appRegistrySource).toContain("import.meta.glob");
+    expect(appRegistrySource).toContain("apps/*/src/main.tsx");
+    expect(appRegistrySource).toContain("apps/*/src/main.ts");
+    expect(appRegistrySource).toContain("app.id");
   });
 
   it("uses descriptive workspace package names for canonical apps", () => {
@@ -62,8 +68,12 @@ describe("platform integration inventory", () => {
         "utf8"
       );
 
-      expect(indexHtml).toContain('src="./src/main.ts"');
+      // Apps may use either main.ts (Cycle.js) or main.tsx (React).
+      const hasRelativeTs = indexHtml.includes('src="./src/main.ts"');
+      const hasRelativeTsx = indexHtml.includes('src="./src/main.tsx"');
+      expect(hasRelativeTs || hasRelativeTsx).toBe(true);
       expect(indexHtml).not.toContain('src="/src/main.ts"');
+      expect(indexHtml).not.toContain('src="/src/main.tsx"');
     }
   });
 
@@ -78,14 +88,17 @@ describe("platform integration inventory", () => {
   });
 
   it("keeps the platform module picker in the left sidebar", () => {
-    const mainSource = readFileSync(resolve(process.cwd(), "src/main.ts"), "utf8");
+    const sidebarSource = readFileSync(
+      resolve(process.cwd(), "src/shell/Sidebar.tsx"),
+      "utf8"
+    );
     const styles = readFileSync(resolve(process.cwd(), "src/styles.css"), "utf8");
 
-    expect(mainSource).toContain("platform-sidebar");
-    expect(mainSource).toContain("platform-sidebar__mark");
-    expect(mainSource).toContain("platform-sidebar__tip");
-    expect(mainSource).toContain("visualizer-nav__label");
-    expect(mainSource).not.toContain("platform-header");
+    expect(sidebarSource).toContain("platform-sidebar");
+    expect(sidebarSource).toContain("platform-sidebar__mark");
+    expect(sidebarSource).toContain("platform-sidebar__tip");
+    expect(sidebarSource).toContain("visualizer-nav__label");
+    expect(sidebarSource).not.toContain("platform-header");
     expect(styles).toContain("--bg: #f8f3ea");
     expect(styles).toContain("--sage: #6f8f7a");
     expect(styles).toContain("grid-template-columns: 310px minmax(0, 1fr)");
@@ -103,27 +116,38 @@ describe("platform integration inventory", () => {
       (visualizer) => visualizer.source === "wals"
     );
 
+    // WALS apps share a single React template (WalsApp.tsx) that owns the
+    // experiment-and-teaching layout. Each app only contributes a
+    // module-config.ts and a custom.css. Design tokens (--bg, --sage, etc.)
+    // are centralized in the shared tokens.css.
+    const walsAppSource = readFileSync(
+      resolve(process.cwd(), "apps/shared/wals/WalsApp.tsx"),
+      "utf8"
+    );
+    const tokensCss = readFileSync(
+      resolve(process.cwd(), "apps/shared/styles/tokens.css"),
+      "utf8"
+    );
+
+    expect(walsAppSource).toContain("experiment-board");
+    expect(walsAppSource).toContain("output-dock");
+    expect(walsAppSource).toContain("teaching-area");
+    expect(walsAppSource).toContain("parameter-panel");
+
+    expect(tokensCss).toContain("--bg: #f8f3ea");
+    expect(tokensCss).toContain("--sage: #6f8f7a");
+
     for (const visualizer of walsVisualizers) {
-      const viewFiles = listSourceFiles(resolve(process.cwd(), visualizer.path, "src/components"))
-        .filter((filePath) => filePath.endsWith("/view.ts"));
-      const viewSource = viewFiles.map((filePath) => readFileSync(filePath, "utf8")).join("\n");
       const css = readFileSync(
         resolve(process.cwd(), visualizer.path, "src/styles/custom.css"),
         "utf8"
       );
 
-      expect(viewSource).toContain(".experiment-board");
-      expect(viewSource).toContain(".output-dock");
-      expect(viewSource).toContain(".teaching-area");
-      expect(viewSource).toContain(".parameter-panel");
-      expect(viewSource).not.toContain("renderModuleGroup");
       expect(css).toContain(".module-layout");
       expect(css).toContain(".experiment-board");
       expect(css).toContain(".output-dock");
       expect(css).toContain(".teaching-area");
       expect(css).toContain(".parameter-panel");
-      expect(css).toContain("--bg: #f8f3ea");
-      expect(css).toContain("--sage: #6f8f7a");
       expect(css).toContain("height: 100vh");
       expect(css).toContain("overflow-y: auto");
       expect(css).toContain("overscroll-behavior: contain");

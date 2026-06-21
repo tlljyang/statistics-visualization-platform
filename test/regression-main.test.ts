@@ -6,15 +6,15 @@ import { getRegressionDataBaseUrl } from "../apps/regression/src/dataBaseUrl";
 describe("regression app bootstrap", () => {
   it("initializes the data base URL before building sidebar dataset paths", () => {
     const mainSource = readFileSync(
-      resolve(process.cwd(), "apps/regression/src/main.ts"),
+      resolve(process.cwd(), "apps/regression/src/App.tsx"),
       "utf8"
     );
 
-    const dataBaseUrlDeclaration = mainSource.indexOf("const dataBaseUrl");
-    const sidebarPropsDeclaration = mainSource.indexOf("const sidebarProps$");
+    const dataBaseUrlDeclaration = mainSource.indexOf("getRegressionDataBaseUrl");
+    const datasetPathsDeclaration = mainSource.indexOf("DATASET_PATHS");
 
     expect(dataBaseUrlDeclaration).toBeGreaterThanOrEqual(0);
-    expect(dataBaseUrlDeclaration).toBeLessThan(sidebarPropsDeclaration);
+    expect(dataBaseUrlDeclaration).toBeLessThan(datasetPathsDeclaration);
   });
 
   it("serves regression datasets from the nested app public folder in platform dev", () => {
