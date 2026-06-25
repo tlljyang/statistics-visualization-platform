@@ -1,24 +1,11 @@
 import { useLanguage, setLanguage, getPlatformCopy, getVisualizerLabel } from "@stats-viz/shared/i18n";
-import { apps, type AppRecord } from "../../scripts/apps.mjs";
+import { apps, type AppRecord } from "../../scripts/apps";
 
 const GROUP_ORDER: AppRecord["group"][] = [
   "Core Visualizers",
   "WALS Simulation",
   "WALS MES",
 ];
-
-function iconForVisualizer(id: string): string {
-  if (id.includes("confidence")) return "∫";
-  if (id.includes("type-error")) return "α";
-  if (id.includes("regression")) return "β";
-  if (id.includes("random-variable")) return "ξ";
-  if (id.includes("resampling")) return "⟳";
-  if (id.includes("mcmc")) return "π";
-  if (id.includes("anova")) return "F";
-  if (id.includes("distribution")) return "φ";
-  if (id.includes("variance")) return "σ²";
-  return "μ";
-}
 
 interface SidebarProps {
   activeId: string;
@@ -73,7 +60,7 @@ export function Sidebar({ activeId, onNavigate }: SidebarProps) {
                       onClick={() => onNavigate(app.id)}
                     >
                       <span className="visualizer-nav__icon">
-                        {iconForVisualizer(app.id)}
+                        {app.icon}
                       </span>
                       <span className="visualizer-nav__copy">
                         <span className="visualizer-nav__label">{label}</span>

@@ -1,9 +1,10 @@
-import * as d3 from "d3";
+import { scaleLinear, line, scaleBand, type ScaleLinear } from "d3";
 import type { ChartPoint, ChartSpec } from "./types";
+import { CHART_LAYOUT } from "@stats-viz/shared/chart-utils";
 
-const width = 760;
-const height = 380;
-const margin = { top: 34, right: 24, bottom: 54, left: 64 };
+const width = CHART_LAYOUT.width;
+const height = CHART_LAYOUT.height;
+const margin = CHART_LAYOUT.margin;
 
 function extent(values: number[], fallback: [number, number]): [number, number] {
   const min = values.reduce((a, b) => Math.min(a, b), Infinity);
@@ -14,7 +15,7 @@ function extent(values: number[], fallback: [number, number]): [number, number] 
 }
 
 interface TickProps {
-  scale: d3.ScaleLinear<number, number>;
+  scale: ScaleLinear<number, number>;
   orientation: "x" | "y";
 }
 
@@ -94,9 +95,9 @@ function ScatterChart({ spec }: { spec: Extract<ChartSpec, { type: "scatter" }> 
     spec.points.map((p) => p.y).concat(spec.line?.points.map((p) => p.y) ?? []),
     [0, 1]
   );
-  const x = d3.scaleLinear().domain(xDomain).nice().range([margin.left, width - margin.right]);
-  const y = d3.scaleLinear().domain(yDomain).nice().range([height - margin.bottom, margin.top]);
-  const line = d3.line<ChartPoint>().x((p) => x(p.x)).y((p) => y(p.y));
+  const x = scaleLinear().domain(xDomain).nice().range([margin.left, width - margin.right]);
+  const y = scaleLinear().domain(yDomain).nice().range([height - margin.bottom, margin.top]);
+  const lineGen = line<ChartPoint>().x((p) => x(p.x)).y((p) => y(p.y));
   return (
     <Frame title={spec.title} xLabel={spec.xLabel} yLabel={spec.yLabel}>
       <line x1={margin.left} x2={width - margin.right} y1={height - margin.bottom} y2={height - margin.bottom} stroke="#cbd5e1" />
@@ -104,7 +105,7 @@ function ScatterChart({ spec }: { spec: Extract<ChartSpec, { type: "scatter" }> 
       <AxisTicks scale={x} orientation="x" />
       <AxisTicks scale={y} orientation="y" />
       {spec.line && (
-        <path d={line(spec.line.points) ?? ""} fill="none" stroke={spec.line.color ?? "#d1495b"} strokeWidth={3} />
+        <path d={lineGen(spec.line.points) ?? ""} fill="none" stroke={spec.line.color ?? "#d1495b"} strokeWidth={3} />
       )}
       {spec.points.map((point, i) => (
         <circle
@@ -124,9 +125,9 @@ function LineChart({ spec }: { spec: Extract<ChartSpec, { type: "line" }> }) {
   const points = spec.series.flatMap((s) => s.points);
   const xDomain = spec.xDomain ?? extent(points.map((p) => p.x), [0, 1]);
   const yDomain = spec.yDomain ?? extent(points.map((p) => p.y), [0, 1]);
-  const x = d3.scaleLinear().domain(xDomain).nice().range([margin.left, width - margin.right]);
-  const y = d3.scaleLinear().domain(yDomain).nice().range([height - margin.bottom, margin.top]);
-  const line = d3.line<ChartPoint>().x((p) => x(p.x)).y((p) => y(p.y));
+  const x = scaleLinear().domain(xDomain).nice().range([margin.left, width - margin.right]);
+  const y = scaleLinear().domain(yDomain).nice().range([height - margin.bottom, margin.top]);
+  const lineGen = line<ChartPoint>().x((p) => x(p.x)).y((p) => y(p.y));
   return (
     <Frame title={spec.title} xLabel={spec.xLabel} yLabel={spec.yLabel}>
       <line x1={margin.left} x2={width - margin.right} y1={height - margin.bottom} y2={height - margin.bottom} stroke="#cbd5e1" />
@@ -134,7 +135,7 @@ function LineChart({ spec }: { spec: Extract<ChartSpec, { type: "line" }> }) {
       <AxisTicks scale={x} orientation="x" />
       <AxisTicks scale={y} orientation="y" />
       {spec.series.map((series, i) => (
-        <path key={i} d={line(series.points) ?? ""} fill="none" stroke={series.color ?? "#136f63"} strokeWidth={3} />
+        <path key={i} d={lineGen(series.points) ?? ""} fill="none" stroke={series.color ?? "#136f63"} strokeWidth={3} />
       ))}
     </Frame>
   );
@@ -143,8 +144,8 @@ function LineChart({ spec }: { spec: Extract<ChartSpec, { type: "line" }> }) {
 function BarsChart({ spec }: { spec: Extract<ChartSpec, { type: "bars" }> }) {
   const maxValue = Math.max(...spec.bars.map((b) => b.value), 1);
   const yDomain = spec.yDomain ?? [0, maxValue * 1.15] as [number, number];
-  const x = d3.scaleBand().domain(spec.bars.map((b) => b.label)).range([margin.left, width - margin.right]).padding(0.18);
-  const y = d3.scaleLinear().domain(yDomain).nice().range([height - margin.bottom, margin.top]);
+  const x = scaleBand().domain(spec.bars.map((b) => b.label)).range([margin.left, width - margin.right]).padding(0.18);
+  const y = scaleLinear().domain(yDomain).nice().range([height - margin.bottom, margin.top]);
   return (
     <Frame title={spec.title} xLabel={spec.xLabel} yLabel={spec.yLabel}>
       <line x1={margin.left} x2={width - margin.right} y1={height - margin.bottom} y2={height - margin.bottom} stroke="#cbd5e1" />
@@ -168,8 +169,8 @@ function BarsChart({ spec }: { spec: Extract<ChartSpec, { type: "bars" }> }) {
 function IntervalsChart({ spec }: { spec: Extract<ChartSpec, { type: "intervals" }> }) {
   const values = spec.intervals.flatMap((i) => [i.lower, i.upper, i.center]);
   const xDomain = spec.xDomain ?? extent(values, [0, 1]);
-  const x = d3.scaleLinear().domain(xDomain).nice().range([margin.left, width - margin.right]);
-  const y = d3.scaleBand().domain(spec.intervals.map((i) => i.label)).range([margin.top, height - margin.bottom]).padding(0.35);
+  const x = scaleLinear().domain(xDomain).nice().range([margin.left, width - margin.right]);
+  const y = scaleBand().domain(spec.intervals.map((i) => i.label)).range([margin.top, height - margin.bottom]).padding(0.35);
   return (
     <Frame title={spec.title} xLabel={spec.xLabel} yLabel={spec.yLabel}>
       <line x1={margin.left} x2={width - margin.right} y1={height - margin.bottom} y2={height - margin.bottom} stroke="#cbd5e1" />
@@ -196,26 +197,24 @@ function IntervalsChart({ spec }: { spec: Extract<ChartSpec, { type: "intervals"
 function CltChart({ spec }: { spec: Extract<ChartSpec, { type: "clt" }> }) {
   const top = { x: margin.left, y: 54, width: width - margin.left - margin.right, height: 104 };
   const bottom = { x: margin.left, y: 210, width: width - margin.left - margin.right, height: 116 };
-  const x = d3.scaleLinear().domain(spec.xDomain).nice().range([bottom.x, bottom.x + bottom.width]);
+  const x = scaleLinear().domain(spec.xDomain).nice().range([bottom.x, bottom.x + bottom.width]);
   const populationMax = Math.max(...spec.populationBars.map((b) => b.value), 1);
   const samplingMax = Math.max(
     ...spec.sampleMeanBars.map((b) => b.value),
     ...spec.normalCurve.map((p) => p.y),
     1
   );
-  const popY = d3.scaleLinear().domain([0, populationMax * 1.15]).range([top.y + top.height, top.y]);
-  const meanY = d3.scaleLinear().domain([0, samplingMax * 1.18]).range([bottom.y + bottom.height, bottom.y]);
-  const popX = d3
-    .scaleBand()
+  const popY = scaleLinear().domain([0, populationMax * 1.15]).range([top.y + top.height, top.y]);
+  const meanY = scaleLinear().domain([0, samplingMax * 1.18]).range([bottom.y + bottom.height, bottom.y]);
+  const popX = scaleBand()
     .domain(spec.populationBars.map((b) => b.label))
     .range([top.x, top.x + top.width])
     .padding(0.18);
-  const meanX = d3
-    .scaleBand()
+  const meanX = scaleBand()
     .domain(spec.sampleMeanBars.map((b) => b.label))
     .range([bottom.x, bottom.x + bottom.width])
     .padding(0.16);
-  const normalLine = d3.line<ChartPoint>().x((p) => x(p.x)).y((p) => meanY(p.y));
+  const normalLine = line<ChartPoint>().x((p) => x(p.x)).y((p) => meanY(p.y));
   const latestMean = spec.latestMean === undefined ? null : x(spec.latestMean);
   const populationMean = x(spec.populationMean);
 

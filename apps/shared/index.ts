@@ -5,3 +5,6 @@ export * from "./i18n";
 export * from "./random";
 export * from "./format";
 export * from "./math";
+export * from "./confidence-interval";
+export * from "./chart-utils";
+export * from "./regression";

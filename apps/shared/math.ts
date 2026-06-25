@@ -1,6 +1,12 @@
 // Special-function + chart helpers consolidated from the per-app engine.ts copies.
 // Behavior-preserving: the `histogram` unification keys off `domain` (see comment).
+//
+// normalCdf/normalPdf delegate to jStat so the whole platform shares ONE
+// implementation (previously math.ts used an erf approximation while
+// type-error/App.tsx and distributions.ts used jStat, causing tiny but real
+// numerical disagreements between modules that should agree).
 
+import jStat from "jstat";
 import { formatNumber, mean } from "./format";
 
 export interface ChartBar {
@@ -8,26 +14,16 @@ export interface ChartBar {
   value: number;
 }
 
-export function erf(x: number): number {
-  const sign = Math.sign(x);
-  const a1 = 0.254829592;
-  const a2 = -0.284496736;
-  const a3 = 1.421413741;
-  const a4 = -1.453152027;
-  const a5 = 1.061405429;
-  const p = 0.3275911;
-  const absX = Math.abs(x);
-  const t = 1 / (1 + p * absX);
-  const y = 1 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-absX * absX);
-  return sign * y;
-}
-
 export function normalPdf(x: number, mu = 0, sd = 1): number {
-  return Math.exp(-0.5 * ((x - mu) / sd) ** 2) / (sd * Math.sqrt(2 * Math.PI));
+  return jStat.normal.pdf(x, mu, sd);
 }
 
 export function normalCdf(x: number, mu = 0, sd = 1): number {
-  return 0.5 * (1 + erf((x - mu) / (sd * Math.sqrt(2))));
+  return jStat.normal.cdf(x, mu, sd);
+}
+
+export function normalInv(p: number, mu = 0, sd = 1): number {
+  return jStat.normal.inv(p, mu, sd);
 }
 
 export function linearRegression(points: Array<{ x: number; y: number }>) {
@@ -35,12 +31,20 @@ export function linearRegression(points: Array<{ x: number; y: number }>) {
   const yMean = mean(points.map((point) => point.y));
   const sxx = points.reduce((sum, point) => sum + (point.x - xMean) ** 2, 0);
   const sxy = points.reduce((sum, point) => sum + (point.x - xMean) * (point.y - yMean), 0);
+  // Degenerate x variance: slope is undefined. Return a zero-slope fit through
+  // (xMean, yMean) so callers (regression app, outlier diagnostics, WALS
+  // regression example) get finite numbers instead of Infinity/NaN. Mirrors the
+  // sxx guard already present in computeOutlierDiagnostics.
+  if (sxx <= Number.EPSILON) {
+    const sst = points.reduce((sum, point) => sum + (point.y - yMean) ** 2, 0);
+    return { slope: 0, intercept: yMean, rSquared: 0, sse: sst };
+  }
   const slope = sxy / sxx;
   const intercept = yMean - slope * xMean;
   const fitted = points.map((point) => intercept + slope * point.x);
   const sst = points.reduce((sum, point) => sum + (point.y - yMean) ** 2, 0);
   const sse = points.reduce((sum, point, index) => sum + (point.y - fitted[index]) ** 2, 0);
-  const rSquared = 1 - sse / sst;
+  const rSquared = sst <= Number.EPSILON ? 0 : 1 - sse / sst;
 
   return { slope, intercept, rSquared, sse };
 }
@@ -59,17 +63,27 @@ export function linearRegression(points: Array<{ x: number; y: number }>) {
 export function histogram(values: number[], count = 18, domain?: [number, number]): ChartBar[] {
   const min = domain?.[0] ?? values.reduce((a, b) => Math.min(a, b), Infinity);
   const max = domain?.[1] ?? values.reduce((a, b) => Math.max(a, b), -Infinity);
-  const width = (max - min || 1) / count;
-  const bins = Array.from({ length: count }, (_, index) => ({
-    label: formatNumber(min + width * (index + 0.5), 2),
-    value: 0
-  }));
+  const range = max - min;
 
+  // All values identical: show a single centered spike instead of piling
+  // everything into bin[0], which made a constant sample look left-skewed.
+  if (range === 0) {
+    const centerIndex = Math.floor(count / 2);
+    return Array.from({ length: count }, (_, index) => ({
+      label: formatNumber(min, 2),
+      value: index === centerIndex ? values.length : 0,
+    }));
+  }
+
+  const width = range / count;
+  const counts = new Uint32Array(count);
   for (const value of values) {
     if (value < min || value > max) continue;
     const index = Math.min(count - 1, Math.max(0, Math.floor((value - min) / width)));
-    bins[index].value += 1;
+    counts[index] += 1;
   }
-
-  return bins;
+  return Array.from(counts, (value, index) => ({
+    label: formatNumber(min + width * (index + 0.5), 2),
+    value,
+  }));
 }

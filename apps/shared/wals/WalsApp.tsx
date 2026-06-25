@@ -1,11 +1,10 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useDeferredValue, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import {
   localizeModuleConfig,
   localizeSimulationResult,
-  localizeText,
-  templateCopy,
   useLanguage,
+  walsCopy,
 } from "@stats-viz/shared/i18n";
 import { generateSampleMeans, runExample } from "./engine";
 import { Chart } from "./charts";
@@ -38,7 +37,7 @@ export function createState(
   const mergedControls = { ...createDefaultControls(activeExample), ...(controls ?? {}) };
   return {
     language,
-    copy: templateCopy[language],
+    copy: walsCopy[language],
     config,
     activeExample,
     controls: mergedControls,
@@ -101,102 +100,95 @@ function renderControl(
   );
 }
 
-function renderFormula(state: State): ReactNode {
-  const moduleId = state.config.id.toLowerCase();
-
-  if (moduleId.includes("clt")) {
-    return (
-      <div className="math-expression">
-        <span>X̄</span>
-        <span className="math-symbol">≈</span>
-        <span>N</span>
-        <span>
-          (μ,{" "}
-          <span className="math-frac">
-            <span className="math-num">σ</span>
-            <span className="math-den">
-              √<span>n</span>
-            </span>
-          </span>
-          )
-        </span>
-      </div>
-    );
-  }
-
-  if (moduleId.includes("anova")) {
-    return (
-      <div className="math-expression">
-        <span>F =</span>
+// Formula panels keyed by example kind (not module id substring), so the
+// dispatch stays in sync with the engine runner registry in engine.ts.
+const formulaRenderers: Record<string, (state: State) => ReactNode> = {
+  "central-limit-theorem": () => (
+    <div className="math-expression">
+      <span>X̄</span>
+      <span className="math-symbol">≈</span>
+      <span>N</span>
+      <span>
+        (μ,{" "}
         <span className="math-frac">
-          <span className="math-num">
-            MS<sub>between</sub>
-          </span>
+          <span className="math-num">σ</span>
           <span className="math-den">
-            MS<sub>within</sub>
+            √<span>n</span>
           </span>
         </span>
-      </div>
-    );
-  }
-
-  if (moduleId.includes("regression")) {
-    return (
-      <div className="math-expression">
-        <span>SSE =</span>
-        <span className="math-symbol">Σ</span>
-        <span>
-          (y<sub>i</sub> − ŷ<sub>i</sub>)
+        )
+      </span>
+    </div>
+  ),
+  "anova": () => (
+    <div className="math-expression">
+      <span>F =</span>
+      <span className="math-frac">
+        <span className="math-num">
+          MS<sub>between</sub>
         </span>
-        <sup>2</sup>
-      </div>
-    );
-  }
-
-  if (moduleId.includes("confidence")) {
-    return (
-      <div className="math-expression">
-        <span>{localizeText("estimate", state.language)}</span>
-        <span className="math-symbol">±</span>
-        <span>{localizeText("critical value", state.language)}</span>
-        <span className="math-symbol">×</span>
-        <span>SE</span>
-      </div>
-    );
-  }
-
-  if (moduleId.includes("distribution")) {
-    return (
-      <div className="math-expression">
-        <span>P(a ≤ X ≤ b) =</span>
-        <span className="math-symbol">∫</span>
-        <span>
-          <sub>a</sub>
-          <sup>b</sup>
+        <span className="math-den">
+          MS<sub>within</sub>
         </span>
-        <span>f(x) dx</span>
-      </div>
-    );
-  }
+      </span>
+    </div>
+  ),
+  "linear-regression": () => (
+    <div className="math-expression">
+      <span>SSE =</span>
+      <span className="math-symbol">Σ</span>
+      <span>
+        (y<sub>i</sub> − ŷ<sub>i</sub>)
+      </span>
+      <sup>2</sup>
+    </div>
+  ),
+  "confidence-interval": (state) => (
+    <div className="math-expression">
+      <span>{walsCopy[state.language].estimate}</span>
+      <span className="math-symbol">±</span>
+      <span>{walsCopy[state.language].criticalValue}</span>
+      <span className="math-symbol">×</span>
+      <span>SE</span>
+    </div>
+  ),
+  "distribution": () => (
+    <div className="math-expression">
+      <span>P(a ≤ X ≤ b) =</span>
+      <span className="math-symbol">∫</span>
+      <span>
+        <sub>a</sub>
+        <sup>b</sup>
+      </span>
+      <span>f(x) dx</span>
+    </div>
+  ),
+  "mcmc-mixture": () => (
+    <div className="math-expression">
+      <span>p(θ | y)</span>
+      <span className="math-symbol">∝</span>
+      <span>p(y | θ) p(θ)</span>
+    </div>
+  ),
+};
 
-  if (moduleId.includes("mcmc")) {
-    return (
-      <div className="math-expression">
-        <span>p(θ | y)</span>
-        <span className="math-symbol">∝</span>
-        <span>p(y | θ) p(θ)</span>
-      </div>
-    );
+function renderFormula(state: State): ReactNode {
+  const renderer = formulaRenderers[state.activeExample.kind];
+  if (renderer) {
+    return renderer(state);
   }
-
   return (
     <div className="math-expression">
-      <span>{localizeText("simulation result", state.language)}</span>
+      <span>{walsCopy[state.language].simulationResult}</span>
       <span className="math-symbol">=</span>
-      <span>{localizeText("f(parameters, random seed)", state.language)}</span>
+      <span>{walsCopy[state.language].simulationResultFormula}</span>
     </div>
   );
 }
+
+// Cap accumulated CLT sample means so repeated "draw" clicks cannot grow the
+// histogram data without bound.
+const MAX_SAMPLE_MEANS = 1000;
 
 export interface WalsAppProps {
   moduleConfig: ModuleConfig;
@@ -209,12 +201,23 @@ export function WalsApp({ moduleConfig }: WalsAppProps) {
   const [seed, setSeed] = useState<number>(() => Date.now());
   const [sampleMeans, setSampleMeans] = useState<number[] | undefined>(undefined);
 
-  const isClt = moduleConfig.id === "simulation-clt";
+  // Defer the expensive simulation so slider drags stay responsive.
+  // `controls`/`seed` update urgently (slider thumb tracks the cursor); the
+  // `runExample` work runs in a lower-priority deferred render that React
+  // coalesces, dropping stale intermediate runs instead of freezing the UI.
+  const deferredControls = useDeferredValue(controls);
+  const deferredSeed = useDeferredValue(seed);
 
   const state = useMemo(
-    () => createState(moduleConfig, exampleId, controls, seed, language, sampleMeans),
-    [moduleConfig, exampleId, controls, seed, language, sampleMeans],
+    () => createState(moduleConfig, exampleId, deferredControls, deferredSeed, language, sampleMeans),
+    [moduleConfig, exampleId, deferredControls, deferredSeed, language, sampleMeans],
   );
+
+  // Behavior the generic framework does not model is declared on the active
+  // example itself (accumulateSampleMeans / quickActions), not detected by
+  // matching a module id or example kind.
+  const accumulate = state.activeExample.accumulateSampleMeans ?? false;
+  const quickActions = state.activeExample.quickActions ?? [];
 
   const handleSelectExample = useCallback((id: string) => {
     setExampleId(id);
@@ -225,30 +228,36 @@ export function WalsApp({ moduleConfig }: WalsAppProps) {
 
   const handleUpdateControl = useCallback((id: string, value: ControlValue) => {
     setControls((prev) => ({ ...createDefaultControls(state.activeExample), ...prev, [id]: value }));
-    if (isClt) {
+    if (accumulate) {
       setSampleMeans(undefined);
     }
     setSeed((s) => s + 1);
-  }, [state.activeExample, isClt]);
+  }, [state.activeExample, accumulate]);
 
   const handleRun = useCallback(() => {
-    if (isClt) {
+    if (accumulate) {
+      // Per the accumulateSampleMeans contract, the run button APPENDS a fresh
+      // batch of sample means (count = current length, min 20) instead of
+      // reseeding from scratch. Previously this replaced the array, which wiped
+      // the accumulation the quick-action buttons had built up.
       const current = controls ?? createDefaultControls(state.activeExample);
       const count = Math.max(sampleMeans?.length ?? 0, 20);
       const nextSeed = Date.now();
-      setSampleMeans(generateSampleMeans(current, count, nextSeed));
+      const previous = sampleMeans ?? [];
+      const combined = [...previous, ...generateSampleMeans(current, count, nextSeed)];
+      setSampleMeans(combined.length > MAX_SAMPLE_MEANS ? combined.slice(combined.length - MAX_SAMPLE_MEANS) : combined);
       setSeed(nextSeed);
     } else {
       setSeed(Date.now());
     }
-  }, [isClt, controls, state.activeExample, sampleMeans]);
+  }, [accumulate, controls, state.activeExample, sampleMeans]);
 
-  const handleAddSamples = useCallback((delta: number) => {
+  // "bumpControl" quick actions increment a numeric control (e.g. the
+  // random-variable module's sample size) by a fixed delta.
+  const handleBumpControl = useCallback((controlId: string, delta: number) => {
     setControls((prev) => {
       const current = prev ?? createDefaultControls(state.activeExample);
-      const currentSize = Number(current.sampleSize ?? 0);
-      const next = currentSize + delta;
-      return { ...current, sampleSize: next };
+      return { ...current, [controlId]: Number(current[controlId] ?? 0) + delta };
     });
     setSeed(Date.now());
   }, [state.activeExample]);
@@ -257,7 +266,8 @@ export function WalsApp({ moduleConfig }: WalsAppProps) {
     const current = controls ?? createDefaultControls(state.activeExample);
     const nextSeed = Date.now();
     const previous = sampleMeans ?? [];
-    setSampleMeans([...previous, ...generateSampleMeans(current, count, nextSeed)]);
+    const combined = [...previous, ...generateSampleMeans(current, count, nextSeed)];
+    setSampleMeans(combined.length > MAX_SAMPLE_MEANS ? combined.slice(combined.length - MAX_SAMPLE_MEANS) : combined);
     setSeed(nextSeed);
   }, [controls, state.activeExample, sampleMeans]);
 
@@ -311,48 +321,30 @@ export function WalsApp({ moduleConfig }: WalsAppProps) {
             </div>
             <div className="control-grid">
               {state.activeExample.controls.map((control) =>
-                renderControl(control, state.controls, handleUpdateControl),
+                renderControl(control, controls ?? {}, handleUpdateControl),
               )}
             </div>
             <button type="button" className="run-button" onClick={handleRun}>
-              {isClt ? localizeText("Redraw", language) : state.copy.run}
+              {accumulate ? walsCopy[language].redraw : state.copy.run}
             </button>
-            {state.config.id === "simulation-random-variable" && (
-              <>
-                <button
-                  type="button"
-                  className="sample-quick-button"
-                  data-sample-delta={1}
-                  onClick={() => handleAddSamples(1)}
-                >
-                  {state.copy.addOneSample}
-                </button>
-                <button
-                  type="button"
-                  className="sample-quick-button"
-                  data-sample-delta={20}
-                  onClick={() => handleAddSamples(20)}
-                >
-                  {state.copy.addTwentySamples}
-                </button>
-              </>
-            )}
-            {isClt && (
+            {quickActions.length > 0 && (
               <div className="sample-quick-actions">
-                <button
-                  type="button"
-                  className="sample-quick-button"
-                  onClick={() => handleDrawSamples(1)}
-                >
-                  {localizeText("Draw 1 Sample", language)}
-                </button>
-                <button
-                  type="button"
-                  className="sample-quick-button"
-                  onClick={() => handleDrawSamples(20)}
-                >
-                  {localizeText("Draw 20 Samples", language)}
-                </button>
+                {quickActions.map((action) => (
+                  <button
+                    key={`${action.type}-${action.amount}`}
+                    type="button"
+                    className="sample-quick-button"
+                    onClick={() => {
+                      if (action.type === "drawSampleMeans") {
+                        handleDrawSamples(action.amount);
+                      } else {
+                        handleBumpControl(action.control ?? "sampleSize", action.amount);
+                      }
+                    }}
+                  >
+                    {walsCopy[language][action.copyKey]}
+                  </button>
+                ))}
               </div>
             )}
           </section>

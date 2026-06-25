@@ -7,13 +7,13 @@ export const moduleConfig: ModuleConfig = {
   subtitle:
     "Build the sampling distribution of sample means and compare it with the normal approximation.",
   category: "WALS Simulation",
-  sourcePath: "apps/Simulation/CentralLimitTheorem",
+  sourcePath: "apps/simulation-clt/src",
   examples: [
     {
       id: "clt-lab",
       title: "Sampling Means Lab",
       kind: "central-limit-theorem",
-      sourcePath: "apps/Simulation/CentralLimitTheorem",
+      sourcePath: "apps/simulation-clt/src/module-config.ts",
       description:
         "Repeatedly draw samples from a population, compute each sample mean, and watch those means form a sampling distribution.",
       teachingPoints: [
@@ -44,6 +44,11 @@ export const moduleConfig: ModuleConfig = {
           step: 1,
           defaultValue: 5
         }
+      ],
+      accumulateSampleMeans: true,
+      quickActions: [
+        { type: "drawSampleMeans", amount: 1, copyKey: "draw1Sample" },
+        { type: "drawSampleMeans", amount: 20, copyKey: "draw20Samples" }
       ]
     }
   ]

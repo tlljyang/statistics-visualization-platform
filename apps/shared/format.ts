@@ -34,6 +34,27 @@ export function quantile(values: number[], p: number): number {
   return sorted[lower] * (1 - weight) + sorted[upper] * weight;
 }
 
+/**
+ * Variance-reduction percentage `(1 - reduced / baseline) * 100`, returning
+ * `"n/a"` when the baseline is missing/zero so degenerate inputs do not yield
+ * `Infinity`/`NaN` strings. `reduced` is the variance after the technique,
+ * `baseline` the plain-MC variance it is compared against.
+ */
+export function reductionPct(reduced: number, baseline: number, digits = 2): string {
+  if (!Number.isFinite(reduced) || !Number.isFinite(baseline) || baseline === 0) {
+    return "n/a";
+  }
+  return `${formatNumber((1 - reduced / baseline) * 100, digits)}%`;
+}
+
+/** `numerator / denominator` formatted, or `"n/a"` on a zero/non-finite denominator. */
+export function ratioOrNa(numerator: number, denominator: number, digits = 2): string {
+  if (!Number.isFinite(numerator) || !Number.isFinite(denominator) || denominator === 0) {
+    return "n/a";
+  }
+  return formatNumber(numerator / denominator, digits);
+}
+
 export function parseNumberList(value: string): number[] {
   return value
     .split(",")

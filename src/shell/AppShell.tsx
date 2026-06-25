@@ -6,7 +6,7 @@ import {
   getPlatformCopy,
   getVisualizerLabel,
 } from "@stats-viz/shared/i18n";
-import { getDefaultVisualizer } from "../visualizers";
+import { getDefaultVisualizer } from "../../scripts/apps";
 
 const PLATFORM_SIDEBAR_WIDTH_KEY = "statistics-platform-sidebar-width";
 

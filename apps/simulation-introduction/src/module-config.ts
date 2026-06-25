@@ -4,15 +4,15 @@ export const moduleConfig: ModuleConfig = {
   "id": "simulation-introduction",
   "repoName": "simulation-introduction-visualization",
   "title": "Simulation Introduction",
-  "subtitle": "WALS introductory simulation templates rebuilt as a static Cycle.js teaching app.",
+  "subtitle": "WALS introductory simulation templates rendered as a React teaching app.",
   "category": "WALS Simulation",
-  "sourcePath": "apps/Simulation/Introduction",
+  "sourcePath": "apps/simulation-introduction/src",
   "examples": [
     {
       "id": "pi-circle",
       "title": "Estimation of pi: Drawing a Circle",
       "kind": "pi-circle",
-      "sourcePath": "apps/Simulation/Introduction/example/1.md",
+      "sourcePath": "apps/simulation-introduction/src/module-config.ts",
       "description": "Drop random points into a square and estimate pi from the proportion that lands inside the unit circle.",
       "teachingPoints": [
         "Monte Carlo estimators turn geometric areas into frequencies.",
@@ -34,7 +34,7 @@ export const moduleConfig: ModuleConfig = {
       "id": "buffon-needle",
       "title": "Estimation of pi: Buffon's Needle Experiment",
       "kind": "buffon",
-      "sourcePath": "apps/Simulation/Introduction/server.R",
+      "sourcePath": "apps/simulation-introduction/src/module-config.ts",
       "description": "Cast needles across parallel lines and estimate pi from the crossing probability.",
       "teachingPoints": [
         "The crossing rate links random angles and distances to pi.",

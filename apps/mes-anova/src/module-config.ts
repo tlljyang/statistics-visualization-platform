@@ -6,13 +6,13 @@ export const moduleConfig: ModuleConfig = {
   "title": "ANOVA",
   "subtitle": "WALS Modern Elementary Statistics analysis-of-variance template.",
   "category": "WALS MES",
-  "sourcePath": "apps/MES/ANOVA",
+  "sourcePath": "apps/mes-anova/src",
   "examples": [
     {
       "id": "anova-workbench",
       "title": "Analysis of Variance Workbench",
       "kind": "anova",
-      "sourcePath": "apps/MES/ANOVA/server.R",
+      "sourcePath": "apps/mes-anova/src/module-config.ts",
       "description": "Generate or load three-group data, inspect group summaries, and compare between-group and within-group variation.",
       "teachingPoints": [
         "ANOVA partitions total variability into between-group and within-group components.",

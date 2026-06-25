@@ -6,13 +6,13 @@ export const moduleConfig: ModuleConfig = {
   "title": "Resampling Methods",
   "subtitle": "Bootstrap and resampling workflows from WALS Simulation/Resampling.",
   "category": "WALS Simulation",
-  "sourcePath": "apps/Simulation/Resampling",
+  "sourcePath": "apps/simulation-resampling/src",
   "examples": [
     {
       "id": "parametric-bootstrap",
       "title": "Parametric Bootstrap",
       "kind": "bootstrap-max",
-      "sourcePath": "apps/Simulation/Resampling/ui.R",
+      "sourcePath": "apps/simulation-resampling/src/module-config.ts",
       "description": "Treat the observed sample as a finite population and bootstrap maxima.",
       "teachingPoints": [
         "Bootstrap distributions approximate sampling variability from observed data.",
@@ -40,7 +40,7 @@ export const moduleConfig: ModuleConfig = {
       "id": "mean-bootstrap",
       "title": "MeanBoot",
       "kind": "mean-bootstrap",
-      "sourcePath": "apps/Simulation/Resampling/server.R",
+      "sourcePath": "apps/simulation-resampling/src/module-config.ts",
       "description": "Compare true, sample, and bootstrap estimates of mean and standard error.",
       "teachingPoints": [
         "Bootstrap samples reuse the observed data with replacement.",

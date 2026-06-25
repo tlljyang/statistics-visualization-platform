@@ -17,5 +17,5 @@
     "noFallthroughCasesInSwitch": true,
     "jsx": "react-jsx"
   },
-  "include": ["src", "test", "vite.config.ts"]
+  "include": ["src", "test", "apps", "vite.config.ts"]
 }

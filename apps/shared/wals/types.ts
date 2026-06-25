@@ -19,6 +19,22 @@ export interface ControlConfig {
   options?: SelectOption[];
 }
 
+export type QuickActionType = "drawSampleMeans" | "bumpControl";
+export type QuickActionCopyKey =
+  | "addOneSample"
+  | "addTwentySamples"
+  | "draw1Sample"
+  | "draw20Samples";
+
+export interface QuickAction {
+  type: QuickActionType;
+  amount: number;
+  /** For "bumpControl": the numeric control id to increment. */
+  control?: string;
+  /** Label key into walsCopy. */
+  copyKey: QuickActionCopyKey;
+}
+
 export interface ExampleConfig {
   id: string;
   title: string;
@@ -27,6 +43,19 @@ export interface ExampleConfig {
   description: string;
   teachingPoints: string[];
   controls: ControlConfig[];
+  /**
+   * Optional quick-action buttons rendered in the parameter panel. Replaces
+   * former hardcoded checks on module id / example kind.
+   * - "drawSampleMeans": append `amount` fresh sample means (CLT accumulation).
+   * - "bumpControl": add `amount` to the numeric control named by `control`.
+   */
+  quickActions?: QuickAction[];
+  /**
+   * CLT-style cross-redraw accumulation: the run button appends sample means
+   * instead of just reseeding. Replaces the former kind === "central-limit-theorem"
+   * check.
+   */
+  accumulateSampleMeans?: boolean;
 }
 
 export interface ModuleConfig {

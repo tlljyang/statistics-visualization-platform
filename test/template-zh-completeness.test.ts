@@ -22,6 +22,7 @@ const allowedLatinWords = new Set([
   "PDF",
   "PMF",
   "Phi",
+  "React",
   "SSE",
   "WALS",
   "exp",

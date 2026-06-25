@@ -6,7 +6,7 @@ export const moduleConfig: ModuleConfig = {
   "title": "MES Linear Regression",
   "subtitle": "WALS/MES city skyscraper regression template rebuilt with static data.",
   "category": "WALS MES",
-  "sourcePath": "apps/MES/LinearRegression",
+  "sourcePath": "apps/mes-linear-regression/src",
   "data": {
     "source": "表8-13 中国城市摩天大楼数量(教材数据,具体教材版本待补充)",
     "cities": [
@@ -179,7 +179,7 @@ export const moduleConfig: ModuleConfig = {
       "id": "city-regression",
       "title": "Regression Visualization",
       "kind": "linear-regression",
-      "sourcePath": "apps/MES/LinearRegression/data/cities.csv",
+      "sourcePath": "apps/mes-linear-regression/src/module-config.ts",
       "description": "Model planned skyscrapers from either completed buildings or GDP, using the WALS city dataset.",
       "teachingPoints": [
         "Changing the predictor changes slope, residuals, and R-squared.",

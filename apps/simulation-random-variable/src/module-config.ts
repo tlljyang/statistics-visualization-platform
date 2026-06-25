@@ -6,13 +6,13 @@ export const moduleConfig: ModuleConfig = {
   "title": "Random Variable Generation",
   "subtitle": "Distribution sampling templates from WALS Simulation/RandomVariable.",
   "category": "WALS Simulation",
-  "sourcePath": "apps/Simulation/RandomVariable",
+  "sourcePath": "apps/simulation-random-variable/src",
   "examples": [
     {
       "id": "normal-generation",
       "title": "Example 1: Normal Random Variables",
       "kind": "random-normal",
-      "sourcePath": "apps/Simulation/RandomVariable/example/1.md",
+      "sourcePath": "apps/simulation-random-variable/src/module-config.ts",
       "description": "Generate a normal sample and compare its simulated histogram with the target center.",
       "teachingPoints": [
         "Random generators approximate the target distribution in aggregate.",
@@ -46,13 +46,17 @@ export const moduleConfig: ModuleConfig = {
           "step": 0.1,
           "defaultValue": 1
         }
+      ],
+      "quickActions": [
+        { "type": "bumpControl", "control": "sampleSize", "amount": 1, "copyKey": "addOneSample" },
+        { "type": "bumpControl", "control": "sampleSize", "amount": 20, "copyKey": "addTwentySamples" }
       ]
     },
     {
       "id": "exponential-generation",
       "title": "Example 2: Exponential Random Variables",
       "kind": "random-exponential",
-      "sourcePath": "apps/Simulation/RandomVariable/example/2.md",
+      "sourcePath": "apps/simulation-random-variable/src/module-config.ts",
       "description": "Generate exponential data and examine how the rate parameter controls the tail.",
       "teachingPoints": [
         "Inverse transform sampling maps uniform draws into exponential draws.",
@@ -77,14 +81,18 @@ export const moduleConfig: ModuleConfig = {
           "step": 0.1,
           "defaultValue": 2
         }
+      ],
+      "quickActions": [
+        { "type": "bumpControl", "control": "sampleSize", "amount": 1, "copyKey": "addOneSample" },
+        { "type": "bumpControl", "control": "sampleSize", "amount": 20, "copyKey": "addTwentySamples" }
       ]
     },
     {
       "id": "gamma-rejection",
-      "title": "Example 7: Gamma Rejection Sampling",
+      "title": "Example 3: Gamma Rejection Sampling",
       "kind": "gamma-rejection",
-      "sourcePath": "apps/Simulation/RandomVariable/example/7.md",
-      "description": "Compare target gamma density with an exponential proposal envelope.",
+      "sourcePath": "apps/simulation-random-variable/src/module-config.ts",
+      "description": "Sample from a gamma target by accepting uniform proposals with probability proportional to the gamma density.",
       "teachingPoints": [
         "Acceptance-rejection sampling needs an envelope that dominates the target.",
         "The accepted sample follows the target only after the rejection rule is applied."
@@ -97,7 +105,7 @@ export const moduleConfig: ModuleConfig = {
           "min": 1,
           "max": 10000,
           "step": 1,
-          "defaultValue": 1500
+          "defaultValue": 2000
         },
         {
           "id": "alpha",
@@ -106,7 +114,7 @@ export const moduleConfig: ModuleConfig = {
           "min": 0.5,
           "max": 5,
           "step": 0.1,
-          "defaultValue": 1.5
+          "defaultValue": 2
         },
         {
           "id": "beta",
@@ -116,25 +124,11 @@ export const moduleConfig: ModuleConfig = {
           "max": 5,
           "step": 0.1,
           "defaultValue": 1
-        },
-        {
-          "id": "lambda",
-          "label": "Proposal lambda",
-          "type": "number",
-          "min": 0.1,
-          "max": 5,
-          "step": 0.1,
-          "defaultValue": 0.6667
-        },
-        {
-          "id": "envelope",
-          "label": "Envelope constant c",
-          "type": "number",
-          "min": 0.5,
-          "max": 5,
-          "step": 0.1,
-          "defaultValue": 1.258
         }
+      ],
+      "quickActions": [
+        { "type": "bumpControl", "control": "sampleSize", "amount": 1, "copyKey": "addOneSample" },
+        { "type": "bumpControl", "control": "sampleSize", "amount": 20, "copyKey": "addTwentySamples" }
       ]
     }
   ]

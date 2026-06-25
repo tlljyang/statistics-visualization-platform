@@ -742,13 +742,13 @@ body {
 }
 
 .module-shell {
-  height: 100vh;
+  height: 100%;
   min-height: 0;
   overflow: hidden;
 }
 
 .module-layout {
-  height: calc(100vh - 36px);
+  height: 100%;
   align-items: stretch;
   overflow: hidden;
 }
@@ -894,7 +894,7 @@ body {
 }
 
 .module-shell {
-  height: 100vh;
+  height: 100%;
   min-height: 0;
   padding: 18px;
   overflow: hidden;
@@ -905,7 +905,7 @@ body {
   grid-template-columns: minmax(0, 1fr) 350px;
   gap: 18px;
   align-items: stretch;
-  height: calc(100vh - 36px);
+  height: 100%;
   overflow: hidden;
 }
 

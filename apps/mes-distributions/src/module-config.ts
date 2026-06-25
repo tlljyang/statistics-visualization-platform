@@ -6,13 +6,13 @@ export const moduleConfig: ModuleConfig = {
   "title": "Distributions",
   "subtitle": "Continuous and discrete distribution exploration from WALS/MES.",
   "category": "WALS MES",
-  "sourcePath": "apps/MES/Distributions",
+  "sourcePath": "apps/mes-distributions/src",
   "examples": [
     {
       "id": "distribution-explorer",
       "title": "Distribution Explorer",
       "kind": "distribution",
-      "sourcePath": "apps/MES/Distributions/server.R",
+      "sourcePath": "apps/mes-distributions/src/module-config.ts",
       "description": "Switch between PDF/PMF and CDF/CMF views for common distributions and calculate interval probabilities.",
       "teachingPoints": [
         "Parameters reshape location, spread, skew, and tail behavior.",
@@ -85,7 +85,7 @@ export const moduleConfig: ModuleConfig = {
         },
         {
           "id": "a",
-          "label": "Parameter a",
+          "label": "Parameter a (μ / shape / df / p)",
           "type": "number",
           "min": 0.1,
           "max": 20,
@@ -94,7 +94,7 @@ export const moduleConfig: ModuleConfig = {
         },
         {
           "id": "b",
-          "label": "Parameter b",
+          "label": "Parameter b (σ / shape / df / n / λ)",
           "type": "number",
           "min": 0.1,
           "max": 20,

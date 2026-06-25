@@ -6,13 +6,13 @@ export const moduleConfig: ModuleConfig = {
   "title": "MC Integration and Variance Reduction",
   "subtitle": "Nine WALS variance-reduction templates rebuilt as independent teaching tabs.",
   "category": "WALS Simulation",
-  "sourcePath": "apps/Simulation/VarianceReduction",
+  "sourcePath": "apps/simulation-variance-reduction/src",
   "examples": [
     {
       "id": "mc-exp-integral",
       "title": "Example 1: Basic Monte Carlo Integration",
       "kind": "mc-integral-exp",
-      "sourcePath": "apps/Simulation/VarianceReduction/server.R",
+      "sourcePath": "apps/simulation-variance-reduction/src/module-config.ts",
       "description": "Estimate int_2^4 exp(-x) dx and compare with the exact value.",
       "teachingPoints": [
         "Simple Monte Carlo turns an integral into an average.",
@@ -34,7 +34,7 @@ export const moduleConfig: ModuleConfig = {
       "id": "mc-transform",
       "title": "Example 2: Uniform vs Exponential Sampling",
       "kind": "mc-transform",
-      "sourcePath": "apps/Simulation/VarianceReduction/example/2.md",
+      "sourcePath": "apps/simulation-variance-reduction/src/module-config.ts",
       "description": "Compare two sampling strategies for the same integral.",
       "teachingPoints": [
         "Changing the sampling distribution can reduce variance.",
@@ -56,7 +56,7 @@ export const moduleConfig: ModuleConfig = {
       "id": "normal-cdf",
       "title": "Example 3: Normal CDF Estimation",
       "kind": "normal-cdf",
-      "sourcePath": "apps/Simulation/VarianceReduction/example/3.md",
+      "sourcePath": "apps/simulation-variance-reduction/src/module-config.ts",
       "description": "Estimate Phi(x) by transformation and by indicator simulation.",
       "teachingPoints": [
         "Two unbiased estimators can have different precision.",
@@ -96,7 +96,7 @@ export const moduleConfig: ModuleConfig = {
       "id": "antithetic-exp",
       "title": "Example 4: Antithetic Variables",
       "kind": "antithetic-exp",
-      "sourcePath": "apps/Simulation/VarianceReduction/example/4.md",
+      "sourcePath": "apps/simulation-variance-reduction/src/module-config.ts",
       "description": "Estimate int_0^1 exp(u) du using paired uniforms U and 1-U.",
       "teachingPoints": [
         "Negative correlation between paired samples can reduce variance.",
@@ -118,7 +118,7 @@ export const moduleConfig: ModuleConfig = {
       "id": "antithetic-gamma",
       "title": "Example 5: Antithetic Gamma Integral",
       "kind": "antithetic-gamma",
-      "sourcePath": "apps/Simulation/VarianceReduction/example/5.md",
+      "sourcePath": "apps/simulation-variance-reduction/src/module-config.ts",
       "description": "Use antithetic variables for a gamma-like integral.",
       "teachingPoints": [
         "Antithetic sampling can apply beyond simple exponential integrals.",
@@ -140,7 +140,7 @@ export const moduleConfig: ModuleConfig = {
       "id": "control-exp",
       "title": "Example 6: Control Variates",
       "kind": "control-exp",
-      "sourcePath": "apps/Simulation/VarianceReduction/example/6.md",
+      "sourcePath": "apps/simulation-variance-reduction/src/module-config.ts",
       "description": "Use U - 1/2 as a control variate for exp(U).",
       "teachingPoints": [
         "A correlated variable with known expectation can lower variance.",
@@ -171,7 +171,7 @@ export const moduleConfig: ModuleConfig = {
       "id": "control-ratio",
       "title": "Example 7: Control Variate Ratio Integral",
       "kind": "control-ratio",
-      "sourcePath": "apps/Simulation/VarianceReduction/example/7.md",
+      "sourcePath": "apps/simulation-variance-reduction/src/module-config.ts",
       "description": "Compare a simple estimator with a control-variate adjusted estimator.",
       "teachingPoints": [
         "The control coefficient can be estimated from pilot samples.",
@@ -193,7 +193,7 @@ export const moduleConfig: ModuleConfig = {
       "id": "importance-power",
       "title": "Example 8: Importance Sampling",
       "kind": "importance-power",
-      "sourcePath": "apps/Simulation/VarianceReduction/example/8.md",
+      "sourcePath": "apps/simulation-variance-reduction/src/module-config.ts",
       "description": "Estimate E[X^5.1] using an importance density proportional to x^4.",
       "teachingPoints": [
         "Importance sampling spends more draws where the integrand matters.",
@@ -215,7 +215,7 @@ export const moduleConfig: ModuleConfig = {
       "id": "conditional-circle",
       "title": "Example 9: Conditional Monte Carlo",
       "kind": "conditional-circle",
-      "sourcePath": "apps/Simulation/VarianceReduction/example/9.md",
+      "sourcePath": "apps/simulation-variance-reduction/src/module-config.ts",
       "description": "Estimate a unit-circle probability by conditioning on one coordinate.",
       "teachingPoints": [
         "Conditioning replaces a noisy indicator with a smoother expectation.",

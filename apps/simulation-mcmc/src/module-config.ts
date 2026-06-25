@@ -6,13 +6,13 @@ export const moduleConfig: ModuleConfig = {
   "title": "Markov Chain Monte Carlo",
   "subtitle": "MCMC templates from WALS Simulation/MCMC.",
   "category": "WALS Simulation",
-  "sourcePath": "apps/Simulation/MCMC",
+  "sourcePath": "apps/simulation-mcmc/src",
   "examples": [
     {
       "id": "mixture-normals",
       "title": "Mixture of Normals",
       "kind": "mcmc-mixture",
-      "sourcePath": "apps/Simulation/MCMC/server.R",
+      "sourcePath": "apps/simulation-mcmc/src/module-config.ts",
       "description": "Run a Metropolis-Hastings sampler over a two-component normal mixture.",
       "teachingPoints": [
         "The chain accepts or rejects proposals using a target-density ratio.",
@@ -43,7 +43,7 @@ export const moduleConfig: ModuleConfig = {
       "id": "politician-stumble",
       "title": "Politician's Stumble Case Study",
       "kind": "politician",
-      "sourcePath": "apps/Simulation/MCMC/server.R",
+      "sourcePath": "apps/simulation-mcmc/src/module-config.ts",
       "description": "Simulate a simple Metropolis walk over islands with unequal populations.",
       "teachingPoints": [
         "Stationary visit frequency is shaped by the acceptance rule.",
